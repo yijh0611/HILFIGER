@@ -17,8 +17,8 @@ git commit -m "commit message"
 
 ## Master(main) guide
 git branch -M main
-git push -u origin main # 처음 할 떄
-git push # 다시 할 때
+git push -u origin main # First push
+git push # push again
 
 
 ## Members guide
@@ -32,5 +32,3 @@ git push origin {branch_name}
 git pull 
 # or
 git pull origin {branch_name}
-
-123
