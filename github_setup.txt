@@ -1,0 +1,30 @@
+## Configuration in the workspace
+git init
+git config --global user.name "your_name"
+git config --global user.email "your_email"
+git remote add origin https://github.com/yijh0611/HILFIGER
+
+
+## Delete config
+git config --unset --global user.name "your_name"
+git config --unset --global user.email "your_email"
+
+
+## How to commit
+git add .  # add all files
+git commit -m "commit message"
+
+
+## Master(main) guide
+git branch M main
+git push origin main
+
+
+## Members guide
+git branch {branch_name}   # create your branch
+git checkout {branch_name} # change the master(main) branch to your branch
+git push origin {branch_name}
+
+
+## synchronization
+git pull
