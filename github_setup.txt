@@ -17,14 +17,18 @@ git commit -m "commit message"
 
 ## Master(main) guide
 git branch -M main
-git push origin main
+git push -u origin main # 처음 할 떄
+git push # 다시 할 때
 
 
 ## Members guide
+git branch  # check the all branches
 git branch {branch_name}   # create your branch
 git checkout {branch_name} # change the master(main) branch to your branch
 git push origin {branch_name}
 
 
 ## synchronization
-git pull
+git pull 
+# or
+git pull origin {branch_name}
