@@ -11,12 +11,12 @@ git config --unset --global user.email "your_email"
 
 
 ## How to commit
-git add .  # add all files
+git add .      # add all files
 git commit -m "commit message"
 
 
 ## Master(main) guide
-git branch M main
+git branch -M main
 git push origin main
 
 
