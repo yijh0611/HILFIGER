@@ -16,6 +16,7 @@ git commit -m "commit message"
 
 
 ## Master(main) guide
+git branch             
 git branch -M main
 git push -u origin main  # once
 git push
