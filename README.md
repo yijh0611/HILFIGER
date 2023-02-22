@@ -12,6 +12,7 @@ Regular Meeting : 월요일 오후 3시(15시)<br>
 - BenchMark-3: 수빈(main), 동희, 준학
 <br>
 <br>
+
 ### Configuration in the workspace
 git init
 <br>
@@ -22,6 +23,7 @@ git config --global user.email "your_email"
 git remote add origin https://github.com/yijh0611/HILFIGER.git
 <br>
 <br>
+
 ### Delete config
 git config --unset --global user.name "your_name"
 <br>
