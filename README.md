@@ -87,5 +87,6 @@ step 3-2: 두 번째 파일 commit (반복)
 ...
 <br>
 step 4: 최종적으로 remote repository에 push
+<br>
 $ git push
 <br>
