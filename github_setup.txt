@@ -1,10 +1,10 @@
-## Configuration in the workspace
-git init
-git config --global user.name "your_name"
-git config --global user.email "your_email"
-git remote add origin https://github.com/yijh0611/HILFIGER.git
-
-
+## Configuration in the workspace              
+git init          
+git config --global user.name "your_name"       
+git config --global user.email "your_email"        
+git remote add origin https://github.com/yijh0611/HILFIGER.git        
+       
+          
 ## Delete config
 git config --unset --global user.name "your_name"
 git config --unset --global user.email "your_email"
