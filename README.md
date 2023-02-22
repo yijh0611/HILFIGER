@@ -1,12 +1,12 @@
-# HILFIGER
-<Notion link>
-https://fluff-hole-6c7.notion.site/AiMS-style-a2ee1152c8e34b55a8d0f3f258e0da82
-
-<Schedule>
-Project Deadline: ~ 3월 22일
-Regular Meeting : 월요일 오후 3시(15시)
-
-
+# HILFIGER       
+<Notion link>           
+https://fluff-hole-6c7.notion.site/AiMS-style-a2ee1152c8e34b55a8d0f3f258e0da82       
+      
+<Schedule>      
+Project Deadline: ~ 3월 22일      
+Regular Meeting : 월요일 오후 3시(15시)     
+      
+     
 <Part division>
 BenchMark-1: 준학(main), 우현(main), 동희, 수빈
 BenchMark-2: 동희(main), 우현
