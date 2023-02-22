@@ -1,10 +1,8 @@
 # HILFIGER       
   
-<Notion link>           
-  
+<Notion link><br>
 https://fluff-hole-6c7.notion.site/AiMS-style-a2ee1152c8e34b55a8d0f3f258e0da82   
-  
-        
+<br>
 <Schedule>      
   
 Project Deadline: ~ 3월 22일      
