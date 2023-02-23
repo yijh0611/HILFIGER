@@ -10,12 +10,17 @@ bridge = CvBridge()
 
 
 def image_callback(msg):
-    cv_image = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
-    # print(msg)
-    print(np.shape(msg))
+    img = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
     
-    pass
+    cv2.imshow('Drone image', img)
+
+    cv2.waitKey()
+    # cv2.destroyAllWindows()
+
+    # pass
 
 rospy.init_node('image_subscriber', anonymous=True)
 rospy.Subscriber('/red/camera/color/image_raw', Image, image_callback)
 rospy.spin()
+
+cv2.destroyAllWindows()
