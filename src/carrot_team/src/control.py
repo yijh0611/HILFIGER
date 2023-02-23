@@ -26,7 +26,7 @@ pose_msg.pose.orientation.w = 1.0  # set the w orientation
 # Publish the message
 # rate = rospy.Rate(10)  # 10 Hz
 while not rospy.is_shutdown():
-    x, y, z = input('Type in x, y, z :')
+    x, y, z = map(int, input('Type in x, y, z :').split(' '))
     pose_msg.pose.position.x = x
     pose_msg.pose.position.y = y
     pose_msg.pose.position.z = z
