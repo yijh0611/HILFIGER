@@ -8,7 +8,7 @@ catkin_make
 chmod +x devel/setup.sh
 source devel/setup.sh
 
-chmod +x src/carrot_team/src/control.py
+chmod +x -R src/
 
 cd ..
 cd startup/challenge/
