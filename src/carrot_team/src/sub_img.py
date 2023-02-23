@@ -13,8 +13,8 @@ bridge_2 = CvBridge()
 img = np.array([])
 
 vid_name = 'drone_vid.avi'
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-video = cv2.VideoWriter(vid_name, fourcc, 30.0, (640, 480))
+fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+out = cv2.VideoWriter(vid_name, fourcc, 30.0, (640, 480))
 
 def image_callback(msg):
     global img
@@ -32,8 +32,8 @@ def image_callback_depth(msg):
     img_depth = img_depth / 10
 
     # Record
-    global video
-    video.write(img)
+    global out
+    out.write(img)
 
     # imshow
     cv2.imshow('Depth image', img_depth)
@@ -47,3 +47,4 @@ rospy.Subscriber('/red/camera/depth/image_raw', Image, image_callback_depth)
 rospy.spin()
 
 cv2.destroyAllWindows()
+out.release()

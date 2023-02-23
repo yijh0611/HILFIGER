@@ -34,8 +34,8 @@ pose_publisher = rospy.Publisher('/red/tracker/input_pose', PoseStamped, queue_s
 pose_msg = PoseStamped()
 # pose_msg.header.frame_id = ""  # set the frame ID
 pose_msg.pose.position.x = 2.0  # set the x position
-pose_msg.pose.position.y = 2.0  # set the y position
-pose_msg.pose.position.z = 10.0  # set the z position
+pose_msg.pose.position.y = 10.0  # set the y position
+pose_msg.pose.position.z = 2.0  # set the z position
 pose_msg.pose.orientation.x = 0.0  # set the x orientation
 pose_msg.pose.orientation.y = 0.0  # set the y orientation
 pose_msg.pose.orientation.z = 0.0  # set the z orientation
@@ -50,23 +50,23 @@ while not rospy.is_shutdown():
 
     res = 0.5 # 얼마나 이동하는지
     res_yaw = 90
-    if comm == 'i':
+    if comm == 'l':
         # y 방향 이동
         pose_msg.pose.position.y += res  # set the y position
         if pose_msg.pose.position.y > 14:
             pose_msg.pose.position.y = 14
 
-    elif comm == 'k':
+    elif comm == 'j':
         pose_msg.pose.position.y -= res
         if pose_msg.pose.position.y < 1:
             pose_msg.pose.position.y = 1
     
-    elif comm == 'j':
+    elif comm == 'k':
         pose_msg.pose.position.x -= res
         if pose_msg.pose.position.x < 1:
             pose_msg.pose.position.x = 1
     
-    elif comm == 'l':
+    elif comm == 'i':
         pose_msg.pose.position.x += res
         if pose_msg.pose.position.x > 49:
             pose_msg.pose.position.x = 49
@@ -105,5 +105,5 @@ while not rospy.is_shutdown():
         print('Enter WASD or IJKL')
 
     # move drone
-    print('move to : ', x, y, z, yaw)
+    print('move to : ', pose_msg.pose.position.x, pose_msg.pose.position.y, pose_msg.pose.position.z)
     pose_publisher.publish(pose_msg)
