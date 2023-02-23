@@ -19,7 +19,7 @@ vid_name_d = '/root/uav_ws/src/icuas23_competition/HILFIGER/src/carrot_team/dron
 
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')
 out = cv2.VideoWriter(vid_name, fourcc, 30.0, (640, 480))
-out_d = cv2.VideoWriter(vid_name, fourcc, 30.0, (640, 480))
+out_d = cv2.VideoWriter(vid_name_d, fourcc, 30.0, (640, 480))
 
 def image_callback(msg):
     global img
