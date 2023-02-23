@@ -5,7 +5,7 @@ from cv_bridge import CvBridge
 import numpy as np
 
 def image_callback(msg):
-    global img
+    
     img = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
 
     ### yolo 코드 작성 ###
