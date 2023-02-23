@@ -15,8 +15,11 @@ bridge_2 = CvBridge()
 img = np.array([])
 
 vid_name = '/root/uav_ws/src/icuas23_competition/HILFIGER/src/carrot_team/drone_vid.avi'
+vid_name_d = '/root/uav_ws/src/icuas23_competition/HILFIGER/src/carrot_team/drone_vid_depth.avi'
+
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')
 out = cv2.VideoWriter(vid_name, fourcc, 30.0, (640, 480))
+out_d = cv2.VideoWriter(vid_name, fourcc, 30.0, (640, 480))
 
 def image_callback(msg):
     global img
@@ -35,7 +38,9 @@ def image_callback_depth(msg):
 
     # Record
     global out
+    global out_d
     out.write(img)
+    out_d.write(img_depth)
 
     # imshow
     cv2.imshow('Depth image', img_depth)
