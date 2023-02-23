@@ -39,8 +39,9 @@ def image_callback_depth(msg):
     # Record
     global out
     global out_d
+
     out.write(img)
-    out_d.write(img_depth)
+    # out_d.write(img_depth) # 코덱이 안맞아서 저장이 안되는 것 같다.
 
     # imshow
     cv2.imshow('Depth image', img_depth)
@@ -60,3 +61,4 @@ rospy.spin()
 
 cv2.destroyAllWindows()
 out.release()
+out_d.release()
