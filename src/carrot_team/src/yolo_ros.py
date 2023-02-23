@@ -4,13 +4,14 @@ import rospy
 from cv_bridge import CvBridge
 import numpy as np
 
+from sensor_msgs.msg import Image
+
 def image_callback(msg):
-    global img
     img = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
 
     ### yolo 코드 작성 ###
     # img : 이미지 배열 (480,640,3)
-    
+
 
     ### yolo 코드 여기까지 ###
 
