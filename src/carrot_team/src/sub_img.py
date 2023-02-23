@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys # 파이썬 버전 확인
+
 import rospy
 from cv_bridge import CvBridge
 import numpy as np
@@ -12,7 +14,7 @@ bridge_2 = CvBridge()
 
 img = np.array([])
 
-vid_name = 'drone_vid.avi'
+vid_name = '/root/uav_ws/src/icuas23_competition/HILFIGER/src/carrot_team/drone_vid.avi'
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')
 out = cv2.VideoWriter(vid_name, fourcc, 30.0, (640, 480))
 
@@ -40,6 +42,11 @@ def image_callback_depth(msg):
     cv2.imshow('Drone image', img)
 
     cv2.waitKey(25)
+
+# roslaunch 할때랑 rosrun 할때랑 파이썬 버전이 다른거 같다.
+sys.version
+print('OpenCv version')
+cv2.__version__
 
 rospy.init_node('image_subscriber', anonymous=True)
 rospy.Subscriber('/red/camera/color/image_raw', Image, image_callback)
