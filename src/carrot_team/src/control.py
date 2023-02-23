@@ -41,23 +41,69 @@ pose_msg.pose.orientation.y = 0.0  # set the y orientation
 pose_msg.pose.orientation.z = 0.0  # set the z orientation
 pose_msg.pose.orientation.w = 1.0  # set the w orientation
 
+yaw = 0
+
 # Publish the message
-# rate = rospy.Rate(10)  # 10 Hz
-while not rospy.is_shutdown():
-    x, y, z, yaw = map(int, input('Type in x, y, z, yaw:').split(' '))
-    pose_msg.pose.position.x = x
-    pose_msg.pose.position.y = y
-    pose_msg.pose.position.z = z
+while not rospy.is_shutdown():    
+    # 다른 제어 방법
+    comm = input('Type WASD or IJKL and enter')
 
-    # quaternion_list
-    q = get_quaternion_from_euler(0, 0, yaw)
-    pose_msg.pose.orientation.x = q[0]  # set the x orientation
-    pose_msg.pose.orientation.y = q[1]  # set the y orientation
-    pose_msg.pose.orientation.z = q[2]  # set the z orientation
-    pose_msg.pose.orientation.w = q[3]  # set the w orientation
+    res = 0.5 # 얼마나 이동하는지
+    res_yaw = 90
+    if comm == 'i':
+        # y 방향 이동
+        pose_msg.pose.position.y += res  # set the y position
+        if pose_msg.pose.position.y > 14:
+            pose_msg.pose.position.y = 14
 
+    elif comm == 'k':
+        pose_msg.pose.position.y -= res
+        if pose_msg.pose.position.y < 1:
+            pose_msg.pose.position.y = 1
+    
+    elif comm == 'j':
+        pose_msg.pose.position.x -= res
+        if pose_msg.pose.position.x < 1:
+            pose_msg.pose.position.x = 1
+    
+    elif comm == 'l':
+        pose_msg.pose.position.x += res
+        if pose_msg.pose.position.x > 49:
+            pose_msg.pose.position.x = 49
+
+    elif comm == 'w':
+        pose_msg.pose.position.z += res
+        if pose_msg.pose.position.z > 24:
+            pose_msg.pose.position.z = 24
+
+    elif comm == 's':
+        pose_msg.pose.position.z -= res
+        if pose_msg.pose.position.z < 1:
+            pose_msg.pose.position.z = 1
+        
+    elif comm == 'a':
+        yaw -= 90
+
+        q = get_quaternion_from_euler(0, 0, yaw)
+
+        pose_msg.pose.orientation.x = q[0]  # set the x orientation
+        pose_msg.pose.orientation.y = q[1]  # set the y orientation
+        pose_msg.pose.orientation.z = q[2]  # set the z orientation
+        pose_msg.pose.orientation.w = q[3]  # set the w orientation
+
+    elif comm == 'd':
+        yaw += 90
+
+        q = get_quaternion_from_euler(0, 0, yaw)
+
+        pose_msg.pose.orientation.x = q[0]  # set the x orientation
+        pose_msg.pose.orientation.y = q[1]  # set the y orientation
+        pose_msg.pose.orientation.z = q[2]  # set the z orientation
+        pose_msg.pose.orientation.w = q[3]  # set the w orientation
+    
+    else:
+        print('Enter WASD or IJKL')
+
+    # move drone
     print('move to : ', x, y, z, yaw)
-
     pose_publisher.publish(pose_msg)
-    # print(time.time())
-    # rate.sleep()
