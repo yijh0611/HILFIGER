@@ -33,9 +33,9 @@ pose_publisher = rospy.Publisher('/red/tracker/input_pose', PoseStamped, queue_s
 # Create a PoseStamped message
 pose_msg = PoseStamped()
 # pose_msg.header.frame_id = ""  # set the frame ID
-pose_msg.pose.position.x = 2.0  # set the x position
-pose_msg.pose.position.y = 10.0  # set the y position
-pose_msg.pose.position.z = 2.0  # set the z position
+pose_msg.pose.position.x = 10.0  # set the x position 범위 0 ~ 15
+pose_msg.pose.position.y = 2.0  # set the y position 범위 0 ~ 50
+pose_msg.pose.position.z = 2.0  # set the z position 범위 0 ~ 15
 pose_msg.pose.orientation.x = 0.0  # set the x orientation
 pose_msg.pose.orientation.y = 0.0  # set the y orientation
 pose_msg.pose.orientation.z = 0.0  # set the z orientation
@@ -52,24 +52,24 @@ while not rospy.is_shutdown():
     res_yaw = 90
     if comm == 'l':
         # y 방향 이동
-        pose_msg.pose.position.y += res  # set the y position
-        if pose_msg.pose.position.y > 14:
-            pose_msg.pose.position.y = 14
+        pose_msg.pose.position.x += res  # set the y position
+        if pose_msg.pose.position.x > 14:
+            pose_msg.pose.position.x = 14
 
     elif comm == 'j':
-        pose_msg.pose.position.y -= res
-        if pose_msg.pose.position.y < 1:
-            pose_msg.pose.position.y = 1
-    
-    elif comm == 'k':
         pose_msg.pose.position.x -= res
         if pose_msg.pose.position.x < 1:
             pose_msg.pose.position.x = 1
     
+    elif comm == 'k':
+        pose_msg.pose.position.y -= res
+        if pose_msg.pose.position.y < 1:
+            pose_msg.pose.position.y = 1
+    
     elif comm == 'i':
-        pose_msg.pose.position.x += res
-        if pose_msg.pose.position.x > 49:
-            pose_msg.pose.position.x = 49
+        pose_msg.pose.position.y += res
+        if pose_msg.pose.position.y > 49:
+            pose_msg.pose.position.y = 49
 
     elif comm == 'w':
         pose_msg.pose.position.z += res
