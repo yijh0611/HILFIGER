@@ -49,9 +49,11 @@ def image_callback_depth(msg):
 
     ### send distance
     # 전방에 얼마나 남았는지
-    print(np.shape(img_depth_ori))
-    print()
-
+    h, w = np.shape(img_depth_ori)
+    w_half = w // 2
+    h_half = h // 2
+    
+    print(img_depth_ori[h_half][w_half])
 
     # 어디로 이동할지
 
