@@ -12,7 +12,7 @@ from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64
 
 # distance publisher
-pub_dist = rospy.Publisher('/carrot_team/distance', Float64 , queue_size = 10)
+pub_d = rospy.Publisher('/carrot_team/distance', Float64 , queue_size = 10)
 
 bridge = CvBridge() # Get drone image
 bridge_2 = CvBridge() # Get drone depth map
@@ -67,7 +67,7 @@ def image_callback_depth(msg):
         dist_pub = dist_mid
     
     # publish distance
-    pub.publish(dist_pub)
+    pub_d.publish(dist_pub)
 
     # 어디로 이동할지
 
