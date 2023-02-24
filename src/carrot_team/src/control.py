@@ -50,7 +50,7 @@ while not rospy.is_shutdown():
     comm = input('Type WASD or IJKL and enter')
 
     res = 0.5 # 얼마나 이동하는지
-    res_yaw = 90
+    res_yaw = 45
     if comm == 'l':
         # y 방향 이동
         pose_msg.pose.position.x += res  # set the y position
@@ -83,7 +83,7 @@ while not rospy.is_shutdown():
             pose_msg.pose.position.z = 1
         
     elif comm == 'a':
-        yaw -= 90
+        yaw += res_yaw
 
         q = get_quaternion_from_euler(0, 0, yaw)
 
@@ -93,7 +93,7 @@ while not rospy.is_shutdown():
         pose_msg.pose.orientation.w = q[3]  # set the w orientation
 
     elif comm == 'd':
-        yaw += 90
+        yaw -= res_yaw
 
         q = get_quaternion_from_euler(0, 0, yaw)
 
