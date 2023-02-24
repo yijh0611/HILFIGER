@@ -1,25 +1,35 @@
 #!/usr/bin/env python
 
-import sys # 파이썬 버전 확인
+import os # mkdir
+import sys # check python version
 
-import rospy
-from cv_bridge import CvBridge
-import numpy as np
 import cv2
+import numpy as np
+import rospy
 
-from sensor_msgs.msg import Image
+from cv_bridge import CvBridge # Change ros image into opencv
+from sensor_msgs.msg import Image # Subscribe image
 
-bridge = CvBridge()
-bridge_2 = CvBridge()
+bridge = CvBridge() # Get drone image
+bridge_2 = CvBridge() # Get drone depth map
 
-img = np.array([])
+img = np.array([]) # 전역변수
 
-vid_name = '/root/uav_ws/src/icuas23_competition/HILFIGER/src/carrot_team/drone_vid.avi'
-vid_name_d = '/root/uav_ws/src/icuas23_competition/HILFIGER/src/carrot_team/drone_vid_depth.avi'
+# 동영상 저장하는 폴더가 없으면 만들기
+base_dir = '/root/video'
 
+if not os.path.isdir(base_dir):
+    os.mkdir(base_dir)
+
+# 동영상 저장 경로
+vid_name = base_dir + '/drone_vid.avi'
+vid_name_d = base_dir + '/drone_vid_depth.avi'
+
+# 동영상 코덱
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')
 out = cv2.VideoWriter(vid_name, fourcc, 30.0, (640, 480))
 out_d = cv2.VideoWriter(vid_name_d, fourcc, 30.0, (640, 480))
+
 
 def image_callback(msg):
     global img
@@ -29,12 +39,23 @@ def image_callback(msg):
 
     # cv2.waitKey(25)
 
+
 def image_callback_depth(msg):
     global img
     
     # get depth image
-    img_depth = bridge_2.imgmsg_to_cv2(msg, desired_encoding='passthrough')
-    img_depth = img_depth / 10
+    img_depth_ori = bridge_2.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+    img_depth = img_depth_ori / 10 # convert into (유사) grayscale
+
+    ### send distance
+    # 전방에 얼마나 남았는지
+    print(np.shape(img_depth_ori))
+    print()
+
+
+    # 어디로 이동할지
+
+    ### send distance end
 
     # Record
     global out
@@ -49,7 +70,8 @@ def image_callback_depth(msg):
 
     cv2.waitKey(25)
 
-# roslaunch 할때랑 rosrun 할때랑 파이썬 버전이 다른거 같다.
+
+# roslaunch 할때랑 rosrun 할때랑 파이썬 버전이 다른거 같아서 확인
 sys.version
 print('OpenCv version')
 cv2.__version__
@@ -59,6 +81,7 @@ rospy.Subscriber('/red/camera/color/image_raw', Image, image_callback)
 rospy.Subscriber('/red/camera/depth/image_raw', Image, image_callback_depth)
 rospy.spin()
 
+# 이거는 안쓰일거 같다. - 수정
 cv2.destroyAllWindows()
 out.release()
 out_d.release()
