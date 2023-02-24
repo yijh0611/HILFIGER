@@ -9,6 +9,10 @@ import rospy
 
 from cv_bridge import CvBridge # Change ros image into opencv
 from sensor_msgs.msg import Image # Subscribe image
+from std_msgs.msg import Float64
+
+# distance publisher
+pub_dist = rospy.Publisher('/carrot_team/distance', Float64 , queue_size = 10)
 
 bridge = CvBridge() # Get drone image
 bridge_2 = CvBridge() # Get drone depth map
@@ -53,7 +57,17 @@ def image_callback_depth(msg):
     w_half = w // 2
     h_half = h // 2
     
-    print(img_depth_ori[h_half][w_half])
+    dist_mid = img_depth_ori[h_half][w_half]
+    dist_pub = 0
+
+    isNaN = np.isnan(dist_mid)
+    if isNaN:
+        dist_pub = 10
+    else:
+        dist_pub = dist_mid
+    
+    # publish distance
+    pub.publish(dist_pub)
 
     # 어디로 이동할지
 
@@ -87,3 +101,7 @@ rospy.spin()
 cv2.destroyAllWindows()
 out.release()
 out_d.release()
+
+# get py code
+# wget https://raw.githubusercontent.com/yijh0611/HILFIGER/main/src/carrot_team/src/sub_img.py
+# chmod +x sub_img.py
