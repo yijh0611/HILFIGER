@@ -71,7 +71,7 @@ def image_callback_depth(msg):
     
     # publish distance
     pub_d.publish(dist_pub)
-    
+
     
     # 좌우 중에 어디가 더 많이 남았는지
     left = img_depth_ori[h_half][:w_half]
@@ -97,8 +97,8 @@ def image_callback_depth(msg):
         pub_lr.publish('r')
 
     # 상하 중에 어디가 더 많이 남았는지 - 맞는지 확인 위가 0이고 아래가 480이면 맞고, 아니면 반대로 바꿔야 된다.
-    up = img_depth_ori[:h_half][w_half]
-    down = img_depth_ori[h_half:][w_half]
+    up = img_depth_ori[:h_half, w_half]
+    down = img_depth_ori[h_half:, w_half]
 
     sum_u = 0
     for i in up:
@@ -115,9 +115,9 @@ def image_callback_depth(msg):
             sum_d += i
 
     if sum_u > sum_d:
-        pub_lr.publish('u')
+        pub_ud.publish('u')
     else:
-        pub_lr.publish('d')
+        pub_ud.publish('d')
 
     ### send distance end
 
