@@ -10,9 +10,12 @@ import rospy
 from cv_bridge import CvBridge # Change ros image into opencv
 from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64
+from std_msgs.msg import String
 
 # distance publisher
 pub_d = rospy.Publisher('/carrot_team/distance', Float64 , queue_size = 10)
+pub_lr = rospy.Publisher('/carrot_team/lr', String, queue_size = 10)
+pub_ud = rospy.Publisher('/carrot_team/ud', String, queue_size = 10)
 
 bridge = CvBridge() # Get drone image
 bridge_2 = CvBridge() # Get drone depth map
@@ -68,8 +71,53 @@ def image_callback_depth(msg):
     
     # publish distance
     pub_d.publish(dist_pub)
+    
+    
+    # 좌우 중에 어디가 더 많이 남았는지
+    left = img_depth_ori[h_half][:w_half]
+    right = img_depth_ori[h_half][w_half:]
 
-    # 어디로 이동할지
+    sum_l = 0
+    for i in left:
+        if np.isnan(i):
+            sum_l += 10
+        else:
+            sum_l += i
+
+    sum_r = 0
+    for i in right:
+        if np.isnan(i):
+            sum_r += 10
+        else:
+            sum_r += i
+
+    if sum_l > sum_r:
+        pub_lr.publish('l')
+    else:
+        pub_lr.publish('r')
+
+    # 상하 중에 어디가 더 많이 남았는지 - 맞는지 확인 위가 0이고 아래가 480이면 맞고, 아니면 반대로 바꿔야 된다.
+    up = img_depth_ori[:h_half][w_half]
+    down = img_depth_ori[h_half:][w_half]
+
+    sum_u = 0
+    for i in up:
+        if np.isnan(i):
+            sum_u += 10
+        else:
+            sum_u += i
+
+    sum_d = 0
+    for i in down:
+        if np.isnan(i):
+            sum_d += 10
+        else:
+            sum_d += i
+
+    if sum_u > sum_d:
+        pub_lr.publish('u')
+    else:
+        pub_lr.publish('d')
 
     ### send distance end
 
