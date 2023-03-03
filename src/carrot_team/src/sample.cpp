@@ -13,6 +13,8 @@ using namespace std;
 // Global variables
 float current_pos[3];
 vector<bool> waypoint_index;
+float range, yaw;
+float temp_poi[3];
 
 // ------------------------Orientation Definition--------------------------
 struct Quaternion {
@@ -72,6 +74,7 @@ namespace carrot_team {
         public:
             Drone();
             void go_to_poi(float x, float y, float z, float yaw);
+            void return_home();
 
         private:
             ros::NodeHandle _nh;
@@ -112,6 +115,34 @@ void carrot_team::Drone::go_to_poi(float x, float y, float z, float yaw)
     _trajectory_point_pub.publish(trajectory_point_msg);
 }
 
+void carrot_team::Drone::return_home()
+{
+    _x = 10.0;
+    _y = 2.0;
+    _z = 2.0;
+    _yaw = 0;
+
+    EulerAngles angles;
+    Quaternion q;
+    angles.yaw = _yaw;
+    q = ToQuaternion(angles);
+
+    trajectory_msgs::MultiDOFJointTrajectoryPoint trajectory_point_msg;
+    trajectory_point_msg.transforms.resize(1);
+    trajectory_point_msg.velocities.resize(1);
+    trajectory_point_msg.accelerations.resize(1);
+
+    trajectory_point_msg.transforms[0].translation.x = _x;
+    trajectory_point_msg.transforms[0].translation.y = _y;
+    trajectory_point_msg.transforms[0].translation.z = _z;
+    trajectory_point_msg.transforms[0].rotation.x = q.x;
+    trajectory_point_msg.transforms[0].rotation.y = q.y;
+    trajectory_point_msg.transforms[0].rotation.z = q.z;
+    trajectory_point_msg.transforms[0].rotation.w = q.w;
+    _trajectory_point_pub.publish(trajectory_point_msg);
+}
+
+
 // ---------------------------Call back function--------------------------
 void calculate_range(float *current, float *target, float *range, float *yaw)
 {
@@ -130,10 +161,6 @@ void current_pose_callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
     current_pos[1] = msg->pose.position.y;
     current_pos[2] = msg->pose.position.z;
 
-    float range, yaw;
-    float temp_poi[3];
-    int i;
-
     temp_poi[0] = 7.56;
     temp_poi[1] = 8.32;
     temp_poi[2] = 9.1;
@@ -141,9 +168,6 @@ void current_pose_callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
 
     cout << range << "\n"
          << yaw   << endl;
-
-    carrot_team::Drone carrot_drone;
-    carrot_drone.go_to_poi(temp_poi[0], temp_poi[1], temp_poi[2], yaw);
 }
 
 
@@ -155,8 +179,16 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     ros::Subscriber current_pos_sub = nh.subscribe("red/pose", 10, &current_pose_callback);
-
+    carrot_team::Drone carrot_drone;
+        
     ROS_INFO("vehicle starts!!");
-    ros::spin();
+    ros::Rate rate(5);
+    while (ros::ok())
+    {
+        carrot_drone.go_to_poi(temp_poi[0], temp_poi[1], temp_poi[2], yaw);
+        ros::spinOnce();
+        rate.sleep();
+    }
+    carrot_drone.return_home();
     return 0;
 }
