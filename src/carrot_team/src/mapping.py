@@ -44,6 +44,8 @@ def image_callback_depth(msg):
     plt.plot(dist_mid)
     plt.show()
 
+rospy.init_node('Mapping node', anonymous=True)
+
 rospy.Subscriber('/red/camera/depth/image_raw', Image, image_callback_depth)
 rospy.spin()
 
