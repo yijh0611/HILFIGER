@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 import rospy
 
+from sensor_msgs.msg import Image # Subscribe image
+
 # # 시작할때는 초기값 설정
 # map_np = np.zeros((26, 51)) # 드론이 처음에 바라 보는 방향이 x인지 y인지 확인 필요
 
