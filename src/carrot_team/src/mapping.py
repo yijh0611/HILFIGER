@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import cv2
-import matplotlib
-matplotlib.use('Agg')
+# import matplotlib
+# matplotlib.use('Agg')
+# https://devpress.csdn.net/python/63045c767e6682346619a830.html
 import matplotlib.pyplot as plt
-plt.switch_backend('agg')
+# plt.switch_backend('agg')
 import numpy as np
 import rospy
 
@@ -49,7 +50,10 @@ def image_callback_depth(msg):
             dist_mid[i] = 10
     
     plt.plot(dist_mid)
-    plt.show()
+    # plt.show()
+    plt.savefig(f'./line_plot.jpg', dpi=300)
+    img = cv2.imread(f'./line_plot.jpg')
+    cv2.imshow('image', img)
 
 rospy.init_node('Mapping node', anonymous=True)
 
