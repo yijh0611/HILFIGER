@@ -13,6 +13,7 @@ import threading
 
 from cv_bridge import CvBridge # Change ros image into opencv
 from sensor_msgs.msg import Image # Subscribe image
+from std_msgs.msg import Float64 # get yaw
 
 # # 시작할때는 초기값 설정
 # map_np = np.zeros((26, 51)) # 드론이 처음에 바라 보는 방향이 x인지 y인지 확인 필요
@@ -60,9 +61,13 @@ def image_callback_depth(msg):
     # img = cv2.imread(f'./line_plot.jpg')
     # cv2.imshow('image', img)
 
+def yaw_rad(msg):
+    print(msg)
+
 rospy.init_node('mapping_node', anonymous=True)
 
 rospy.Subscriber('/red/camera/depth/image_raw', Image, image_callback_depth)
+rospy.Subscriber('/red/carrot/yaw', Float64, yaw_rad)
 def ros_spin():
     rospy.spin()
 
@@ -72,7 +77,7 @@ t.start()
 while True:
     deg_cam = 58 # 가로 화각
     # rad_cam = deg_cam * math.pi / 180
-    rad_cam = math.rad(deg_cam)
+    rad_cam = math.radians(deg_cam)
     rad_cam_half = rad_cam / 2
     w = 640
     w_half = 640 // 2
@@ -92,8 +97,30 @@ while True:
         arr_x = np.append(arr_x, dist_x)
         arr_y = np.append(arr_y, dist_y)
 
+    # plt.subplot(2,1,1)
     # plt.plot(dist_mid)
+    # plt.title('Original')
+
+    # plt.subplot(2,1,2)
+    # # plt.plot(arr_x, arr_y)
+    # plt.scatter(arr_x, arr_y)
+    # plt.title('Converted')
+
+    
+    plt.subplot(3,1,1)
+    plt.plot(dist_mid)
+    plt.title('Original')
+
+    plt.subplot(3,1,2)
+    # plt.plot(arr_x, arr_y)
     plt.plot(arr_x, arr_y)
+    plt.title('Converted_line')
+
+    plt.subplot(3,1,3)
+    # plt.plot(arr_x, arr_y)
+    plt.scatter(arr_x, arr_y)
+    plt.title('Converted_dot')
+
     plt.show()
 
 # 드론의 현재 position 받기
