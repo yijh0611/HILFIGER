@@ -109,6 +109,7 @@ while True:
 
         arr_x = np.append(arr_x, dist_x)
         arr_y = np.append(arr_y, dist_y)
+        
     
 
 
