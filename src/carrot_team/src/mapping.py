@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 # plt.switch_backend('agg')
 import numpy as np
 import rospy
+import threading
 
 from cv_bridge import CvBridge # Change ros image into opencv
 from sensor_msgs.msg import Image # Subscribe image
@@ -49,15 +50,23 @@ def image_callback_depth(msg):
         if isNaN:
             dist_mid[i] = 10
     
+    global plt
     plt.plot(dist_mid)
     # plt.show()
-    plt.savefig(f'./line_plot.jpg', dpi=300)
-    img = cv2.imread(f'./line_plot.jpg')
-    cv2.imshow('image', img)
+    # plt.savefig(f'./line_plot.jpg', dpi=300)
+    # img = cv2.imread(f'./line_plot.jpg')
+    # cv2.imshow('image', img)
 
-rospy.init_node('Mapping node', anonymous=True)
+rospy.init_node('mapping_node', anonymous=True)
 
 rospy.Subscriber('/red/camera/depth/image_raw', Image, image_callback_depth)
-rospy.spin()
+def ros_spin():
+    rospy.spin()
+
+t = threading.Thread(target = ros_spin)
+t.start()
+
+while True:
+    plt.show()
 
 # 드론의 현재 position 받기
