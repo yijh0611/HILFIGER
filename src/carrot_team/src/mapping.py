@@ -36,6 +36,7 @@ from sensor_msgs.msg import Image # Subscribe image
 # print(arr)
 
 bridge = CvBridge() # Get drone image
+dist_mid = np.array([])
 
 def image_callback_depth(msg):
 
@@ -43,6 +44,7 @@ def image_callback_depth(msg):
     img_depth = np.array(bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough'))
     
     h_half = 480 // 2
+    global dist_mid
     dist_mid = img_depth[h_half, :]
 
     for i, n in enumerate(dist_mid):
@@ -50,8 +52,8 @@ def image_callback_depth(msg):
         if isNaN:
             dist_mid[i] = 10
     
-    global plt
-    plt.plot(dist_mid)
+    # global plt
+    # plt.plot(dist_mid)
     # plt.show()
     # plt.savefig(f'./line_plot.jpg', dpi=300)
     # img = cv2.imread(f'./line_plot.jpg')
@@ -67,6 +69,7 @@ t = threading.Thread(target = ros_spin)
 t.start()
 
 while True:
+    plt.plot(dist_mid)
     plt.show()
 
 # 드론의 현재 position 받기
