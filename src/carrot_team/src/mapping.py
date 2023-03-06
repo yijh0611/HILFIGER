@@ -15,6 +15,9 @@ from cv_bridge import CvBridge # Change ros image into opencv
 from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64 # get yaw
 
+# 할일 !!!!
+# 클래스 형태로 바꿔서 전역변수 없애기
+
 # # 시작할때는 초기값 설정
 # map_np = np.zeros((26, 51)) # 드론이 처음에 바라 보는 방향이 x인지 y인지 확인 필요
 
@@ -39,6 +42,7 @@ from std_msgs.msg import Float64 # get yaw
 
 bridge = CvBridge() # Get drone image
 dist_mid = np.array([])
+drone_yaw = 0
 
 def image_callback_depth(msg):
 
@@ -62,8 +66,10 @@ def image_callback_depth(msg):
     # cv2.imshow('image', img)
 
 def yaw_rad(msg):
-    print(msg)
-    print(msg.data)
+    # print(msg)
+    # print(msg.data)
+    global drone_yaw
+    drone_yaw = msg.data
 
 rospy.init_node('mapping_node', anonymous=True)
 
@@ -86,6 +92,10 @@ while True:
     arr_x = np.array([])
     arr_y = np.array([])
 
+    # Rotation matrix
+    rot = np.array([[math.cos(drone_yaw), -1 * math.sin(drone_yaw)],[math.sin(drone_yaw), math.cos(drone_yaw)]])
+    print(rot)
+
     for i, d in enumerate(dist_mid):
         n = i - 320
         
@@ -97,6 +107,8 @@ while True:
 
         arr_x = np.append(arr_x, dist_x)
         arr_y = np.append(arr_y, dist_y)
+    
+
 
     # plt.subplot(2,1,1)
     # plt.plot(dist_mid)
