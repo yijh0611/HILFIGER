@@ -97,23 +97,19 @@ while True:
     # print(rot)
 
     for i, d in enumerate(dist_mid):
-        if i < w_half // 10:
-            continue
-        elif i > w_half * 0.9:
-            continue
+        if w // 10 < i or i < w * 0.9:
+            n = i - (w_half - 1) # 처음 시작하는 값을 -319으로 만들기 위함.
             
-        n = i - (w_half - 1) # 처음 시작하는 값을 -319으로 만들기 위함.
-        
-        dist_x = (d * n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
-        dist_y = (d * w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
+            dist_x = (d * n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
+            dist_y = (d * w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
 
-        # if d == 10:
-        #     dist_y = 0
+            # if d == 10:
+            #     dist_y = 0
 
-        dist_x, dist_y = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
+            dist_x, dist_y = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
 
-        arr_x = np.append(arr_x, dist_x)
-        arr_y = np.append(arr_y, dist_y)
+            arr_x = np.append(arr_x, dist_x)
+            arr_y = np.append(arr_y, dist_y)
 
     
 
