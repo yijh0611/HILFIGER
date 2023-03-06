@@ -4,6 +4,7 @@ import cv2
 # import matplotlib
 # matplotlib.use('Agg')
 # https://devpress.csdn.net/python/63045c767e6682346619a830.html
+import math
 import matplotlib.pyplot as plt
 # plt.switch_backend('agg')
 import numpy as np
@@ -69,7 +70,30 @@ t = threading.Thread(target = ros_spin)
 t.start()
 
 while True:
-    plt.plot(dist_mid)
+    deg_cam = 58 # 가로 화각
+    # rad_cam = deg_cam * math.pi / 180
+    rad_cam = math.rad(deg_cam)
+    rad_cam_half = rad_cam / 2
+    w = 640
+    w_half = 640 // 2
+
+    arr_x = np.array([])
+    arr_y = np.array([])
+
+    for i, d in enumerate(dist_mid):
+        n = i - 320
+        
+        dist_x = (d * n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
+        dist_y = (d * w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
+
+        # if d == 10:
+        #     dist_y = 0
+
+        arr_x = np.append(arr_x, dist_x)
+        arr_y = np.append(arr_y, dist_y)
+
+    # plt.plot(dist_mid)
+    plt.plot(arr_x, arr_y)
     plt.show()
 
 # 드론의 현재 position 받기
