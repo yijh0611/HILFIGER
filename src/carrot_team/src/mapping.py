@@ -63,6 +63,7 @@ def image_callback_depth(msg):
 
 def yaw_rad(msg):
     print(msg)
+    print(msg.data)
 
 rospy.init_node('mapping_node', anonymous=True)
 
