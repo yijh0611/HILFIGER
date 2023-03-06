@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 import cv2
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import numpy as np
 import rospy
 
@@ -34,10 +38,10 @@ bridge = CvBridge() # Get drone image
 def image_callback_depth(msg):
 
     # get depth image
-    img_depth = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+    img_depth = np.array(bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough'))
     
-    h_half = 480 / 2
-    dist_mid = img_depth_ori[h_half][:]
+    h_half = 480 // 2
+    dist_mid = img_depth[h_half, :]
 
     for i, n in enumerate(dist_mid):
         isNaN = np.isnan(n)
