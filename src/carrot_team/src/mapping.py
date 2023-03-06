@@ -29,10 +29,12 @@ from sensor_msgs.msg import Image # Subscribe image
 # arr = np.zeros(640) # dist_mid
 # print(arr)
 
+bridge = CvBridge() # Get drone image
+
 def image_callback_depth(msg):
 
     # get depth image
-    img_depth = bridge_2.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+    img_depth = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
     
     h_half = 480 / 2
     dist_mid = img_depth_ori[h_half][:]
