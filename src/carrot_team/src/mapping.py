@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import rospy
 
+from cv_bridge import CvBridge # Change ros image into opencv
 from sensor_msgs.msg import Image # Subscribe image
 
 # # 시작할때는 초기값 설정
