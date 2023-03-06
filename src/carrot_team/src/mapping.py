@@ -94,7 +94,7 @@ while True:
 
     # Rotation matrix
     rot = np.array([[math.cos(drone_yaw), -1 * math.sin(drone_yaw)],[math.sin(drone_yaw), math.cos(drone_yaw)]])
-    print(rot)
+    # print(rot)
 
     for i, d in enumerate(dist_mid):
         n = i - 320
@@ -104,6 +104,8 @@ while True:
 
         # if d == 10:
         #     dist_y = 0
+
+        dist_x, dist_y = rot.dot([dist_x, dist_y].T)
 
         arr_x = np.append(arr_x, dist_x)
         arr_y = np.append(arr_y, dist_y)
