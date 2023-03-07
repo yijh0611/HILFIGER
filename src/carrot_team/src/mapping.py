@@ -21,8 +21,8 @@ from std_msgs.msg import Float64 # get yaw
 # 클래스 형태로 바꿔서 전역변수 없애기
 
 # 시작할때는 초기값 설정
-map_np = np.zeros((26, 51)) # 드론이 시작할때 바라보는 방향은 x이다. 드론의 왼쪽이 y이다.
-map_img = np.zeros((26, 51, 3))
+map_np = np.zeros((16, 51)) # 드론이 시작할때 바라보는 방향은 x이다. 드론의 왼쪽이 y이다.
+map_img = np.zeros((16, 51, 3))
 
 # 0은 미탐색, 1은 갈 수 있음, 2는 갈 수 없음
 # 색칠할때는
@@ -30,15 +30,15 @@ map_img = np.zeros((26, 51, 3))
 
 # 맵의 모양
 '''
-25*50*15
-드론이 바라보고 있는 방향이 x (25m)
+15*50*25
+드론이 바라보고 있는 방향이 x (15m)
 드론의 왼쪽이 y 방향
-높이가 15m이다.
+높이가 25m이다.
 
 초기 값은 10, 2, 2이다.
 
-맵의 크기는 0도 포함해서 26 * 51 * 16으로
-현재는 2D 이기 때문에 26 * 51으로 만들 계획이다.
+맵의 크기는 0도 포함해서 16 * 51 * 26으로
+현재는 2D 이기 때문에 16 * 51으로 만들 계획이다.
 
 
 '''
@@ -174,19 +174,26 @@ while True:
             map_x = int(drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
             map_y = int(drone_pose[1] - wall_x[i])
             
-            if map_np[map_x, map_y] == 0:
-                map_np[map_x, map_y] = 2 # 갈 수 없음
-                map_img[map_x, map_y, 2] = 125
+            try:
+                if map_np[map_x, map_y] == 0:
+                    map_np[map_x, map_y] = 2 # 갈 수 없음
+                    map_img[map_x, map_y, 2] = 125
+            except:
+                print('out of range')
         
         for i in range(len(open_x)):
             map_x = int(drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
             map_y = int(drone_pose[1] - open_x[i])
 
-            if map_np[map_x, map_y] == 0:
-                map_np[map_x, map_y] = 1 # 갈 수 있음
-                map_img[map_x, map_y, :] = 125
+            try:
+                if map_np[map_x, map_y] == 0:
+                    map_np[map_x, map_y] = 1 # 갈 수 있음
+                    map_img[map_x, map_y, :] = 125
+            except:
+                print('out of range')
     
-    img = cv2.resize(map_img, dsize = (260,510))
+    mul = 20
+    img = cv2.resize(map_img, dsize = (16 * mul,51 * mul))
     cv2.imshow('global map', img)
     key = cv2.waitKey(10)
 
