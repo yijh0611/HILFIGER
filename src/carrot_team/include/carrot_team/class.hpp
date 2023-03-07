@@ -23,7 +23,7 @@ class Target_POI
     public:
     Target_POI(ros::NodeHandle *nh);
 
-    void poi_sub_callback(const carrot_team::poi::ConstrPtr &msg);
+    void poi_sub_callback(const carrot_team::poi::ConstPtr &msg);
 
     void calculate_range(float *temp_poi, float *current_pos, float *range, float *yaw);
 
