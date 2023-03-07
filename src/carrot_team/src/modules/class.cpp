@@ -38,7 +38,7 @@ class Target_POI
         }
     }
 
-    void calculate_range(float *temp_poi, *current_pos, float *range, float *yaw) {
+    void calculate_range(float *temp_poi, float *current_pos, float *range, float *yaw) {
         float delta_x, delta_y, delta_z;
         delta_x = current_pos[0] - temp_poi[0];
         delta_y = current_pos[1] - temp_poi[1];
@@ -83,7 +83,7 @@ class Target_POI
             ROS_INFO("target idx is not defined yet");
         }
     }
-}
+};
 
 
 namespace AIMS {
@@ -103,7 +103,7 @@ namespace AIMS {
             zyaw_pub_ = nh->advertise<geometry_msgs::PoseStamped>("/red/tracker/input_pose", 10);
         }
 
-        void pos_sub_callback(const geometry_msgs::PointStamped &msg) {
+        void pos_sub_callback(const geometry_msgs::PoseStamped &msg) {
             current_position_[0] = msg->pose.position.x;
             current_position_[1] = msg->pose.position.y;
             current_position_[2] = msg->pose.position.z;
@@ -125,7 +125,7 @@ namespace AIMS {
             zyaw_pub_.publish(zyaw_point_msg;
             ROS_INFO("Setting zoffset and yaw to target");
         }
-    }
+    };
 }
 
 

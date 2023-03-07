@@ -25,13 +25,13 @@ class Target_POI
 
     void poi_sub_callback(const carrot_team::poi &msg);
 
-    void calculate_range(float *temp_poi, *current_pos, float *range, float *yaw);
+    void calculate_range(float *temp_poi, float *current_pos, float *range, float *yaw);
 
     void find_min_range(float *current_pos);
 
     void get_target_poi(float *target_poi_yaw);
 
-}
+};
 
 
 namespace AIMS {
@@ -43,12 +43,12 @@ namespace AIMS {
         ros::Publisher zyaw_pub_;
 
         public:
-        Vehicle(ros::NodeHandle *nh)
+        Vehicle(ros::NodeHandle *nh);
 
-        void pos_sub_callback(const geometry_msgs::PointStamped &msg);
+        void pos_sub_callback(const geometry_msgs::PoseStamped &msg);
 
         void set_zoffset_yaw(float *target_poi_yaw);
-    }
+    };
 }
 
 #endif
