@@ -166,7 +166,8 @@ while True:
                 open_y = np.append(open_y, dist_y_rot)
     
     # global mapping
-    if time.time() - time_yaw > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
+    if time.time() - time_yaw > 1 and (len(wall_x) > 0 or len(open_x) > 0):
+        print(time.time() - time_yaw)
         # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
         # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
         # print('mapping')
