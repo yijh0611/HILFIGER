@@ -169,7 +169,7 @@ while True:
     if time.time() - time_yaw > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
         # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
         # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
-        print('mapping')
+        # print('mapping')
         for i in range(len(wall_x)):
             map_x = int(drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
             map_y = int(drone_pose[1] - wall_x[i])
@@ -187,7 +187,11 @@ while True:
                 map_img[map_x, map_y, :] = 125
     
     img = cv2.resize(map_img, dsize = (260,510))
-    cv2.imshow(img)
+    cv2.imshow('global map', img)
+    key = cv2.waitKey(10)
+
+    if key == ord('d'):
+        break
 
     # plt.subplot(2,1,1)
     # plt.plot(dist_mid)
@@ -218,3 +222,4 @@ while True:
 
     # plt.show()
 
+cv2.destroyAllWindows()
