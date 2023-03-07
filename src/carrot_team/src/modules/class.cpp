@@ -77,14 +77,16 @@ void Target_POI::get_target_poi(float *target_poi_yaw) {
 
 
 AIMS::Vehicle::Vehicle(ros::NodeHandle *nh) {
-    current_position_[3] = {0, 0, 0};
-    
+    current_position_[0] = 0;
+    current_position_[1] = 0;
+    current_position_[2] = 0;
+
     pos_sub_ = nh->subscribe("/red/pose", 100, &AIMS::Vehicle::pos_sub_callback, this);
 
     zyaw_pub_ = nh->advertise<geometry_msgs::PoseStamped>("/red/tracker/input_pose", 10);
 }
 
-void AIMS::Vehicle::pos_sub_callback(const geometry_msgs::PoseStamped &msg) {
+void AIMS::Vehicle::pos_sub_callback(const geometry_msgs::PoseStamped::ConstPtr &msg) {
     current_position_[0] = msg->pose.position.x;
     current_position_[1] = msg->pose.position.y;
     current_position_[2] = msg->pose.position.z;
@@ -97,13 +99,13 @@ void AIMS::Vehicle::set_zoffset_yaw(float *target_poi_yaw) {
     angle.yaw = target_poi_yaw[3];
     q = ToQuaternion(angle);
 
-    geometry_msgs::PointStamped zyaw_point_msg;
-    zyaw_point_msg.pose.position.z = target_poi_yaw[2];
-    zyaw_point_msg.pose.orientation.w = q.w;
-    zyaw_point_msg.pose.orientation.x = q.x;
-    zyaw_point_msg.pose.orientation.y = q.y;
-    zyaw_point_msg.pose.orientation.z = q.z;
-    zyaw_pub_.publish(zyaw_point_msg;
+    geometry_msgs::PoseStamped zyaw_pose_msg;
+    zyaw_pose_msg.pose.position.z = target_poi_yaw[2];
+    zyaw_pose_msg.pose.orientation.w = q.w;
+    zyaw_pose_msg.pose.orientation.x = q.x;
+    zyaw_pose_msg.pose.orientation.y = q.y;
+    zyaw_pose_msg.pose.orientation.z = q.z;
+    zyaw_pub_.publish(zyaw_pose_msg);
     ROS_INFO("Setting zoffset and yaw to target");
 }
 

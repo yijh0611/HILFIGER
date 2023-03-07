@@ -23,7 +23,7 @@ class Target_POI
     public:
     Target_POI(ros::NodeHandle *nh);
 
-    void poi_sub_callback(const carrot_team::poi &msg);
+    void poi_sub_callback(const carrot_team::poi::ConstrPtr &msg);
 
     void calculate_range(float *temp_poi, float *current_pos, float *range, float *yaw);
 
@@ -45,7 +45,7 @@ namespace AIMS {
         public:
         Vehicle(ros::NodeHandle *nh);
 
-        void pos_sub_callback(const geometry_msgs::PoseStamped &msg);
+        void pos_sub_callback(const geometry_msgs::PoseStamped::ConstPtr &msg);
 
         void set_zoffset_yaw(float *target_poi_yaw);
     };
