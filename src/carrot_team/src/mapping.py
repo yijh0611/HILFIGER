@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import rospy
 import threading
+import time
 
 from cv_bridge import CvBridge # Change ros image into opencv
 from geometry_msgs.msg import PoseStamped
@@ -19,8 +20,11 @@ from std_msgs.msg import Float64 # get yaw
 # 할일 !!!!
 # 클래스 형태로 바꿔서 전역변수 없애기
 
-# # 시작할때는 초기값 설정
-# map_np = np.zeros((26, 51)) # 드론이 처음에 바라 보는 방향이 x인지 y인지 확인 필요
+# 시작할때는 초기값 설정
+map_np = np.zeros((26, 51)) # 드론이 시작할때 바라보는 방향은 x이다. 드론의 왼쪽이 y이다.
+# 0은 미탐색, 1은 갈 수 있음, 2는 갈 수 없음
+# 색칠할때는
+# 검은색 미탐색, 흰색 갈 수 있음, 빨간색 갈 수 없음
 
 # 맵의 모양
 '''
@@ -45,6 +49,7 @@ bridge = CvBridge() # Get drone image
 dist_mid = np.array([])
 drone_yaw = 0
 drone_pose = np.array([])
+time_yaw = time.time()
 
 def image_callback_depth(msg):
 
@@ -71,6 +76,8 @@ def yaw_rad(msg):
     # print(msg)
     # print(msg.data)
     global drone_yaw
+    if msg.data != drone_yaw:
+        time_yaw = time.time()
     drone_yaw = msg.data
 
 def get_pose(msg):
@@ -155,12 +162,25 @@ while True:
 
                 open_x = np.append(open_x, dist_x_rot)
                 open_y = np.append(open_y, dist_y_rot)
-            
-            
-
     
+    # global mapping
+    if time.time() - time_yaw > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
+        # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
+        # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
+        for i in range(len(wall_x)):
+            map_x = int(drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
+            map_y = int(drone_pose[1] - wall_x[i])
+            
+            if map_np[map_x, map_y] == 0:
+                map_np[map_x, map_y] = 2 # 갈 수 없음
+        
+        for i in range(len(open_x)):
+            map_x = int(drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
+            map_y = int(drone_pose[1] - open_x[i])
 
-
+            if map_np[map_x, map_y] == 0:
+                map_np[map_x, map_y] = 1 # 갈 수 있음
+        
     # plt.subplot(2,1,1)
     # plt.plot(dist_mid)
     # plt.title('Original')
@@ -171,22 +191,23 @@ while True:
     # plt.title('Converted')
 
     
-    plt.subplot(3,1,1)
-    plt.plot(dist_mid)
-    plt.title('Original')
+    # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
+    # plt.subplot(3,1,1)
+    # plt.plot(dist_mid)
+    # plt.title('Original')
 
-    plt.subplot(3,1,2)
-    # plt.plot(arr_x, arr_y)
-    plt.plot(wall_x, wall_y)
-    plt.title('Converted_line')
+    # plt.subplot(3,1,2)
+    # # plt.plot(arr_x, arr_y)
+    # plt.plot(wall_x, wall_y)
+    # plt.title('Converted_line')
 
-    plt.subplot(3,1,3)
-    # plt.plot(arr_x, arr_y)
-    plt.scatter(open_x, open_y)
-    plt.scatter(wall_x, wall_y)
-    plt.scatter(0, 0)
-    plt.title('Converted_dot')
+    # plt.subplot(3,1,3)
+    # # plt.plot(arr_x, arr_y)
+    # plt.scatter(open_x, open_y)
+    # plt.scatter(wall_x, wall_y)
+    # plt.scatter(0, 0)
+    # plt.title('Converted_dot')
 
-    plt.show()
+    # plt.show()
 
-# 드론의 현재 position 받기
+    
