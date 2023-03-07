@@ -22,6 +22,8 @@ from std_msgs.msg import Float64 # get yaw
 
 # 시작할때는 초기값 설정
 map_np = np.zeros((26, 51)) # 드론이 시작할때 바라보는 방향은 x이다. 드론의 왼쪽이 y이다.
+map_img = np.zeros((26, 51))
+
 # 0은 미탐색, 1은 갈 수 있음, 2는 갈 수 없음
 # 색칠할때는
 # 검은색 미탐색, 흰색 갈 수 있음, 빨간색 갈 수 없음
@@ -173,6 +175,7 @@ while True:
             
             if map_np[map_x, map_y] == 0:
                 map_np[map_x, map_y] = 2 # 갈 수 없음
+                map_img[map_x, map_y, 2] = 125
         
         for i in range(len(open_x)):
             map_x = int(drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
@@ -180,7 +183,11 @@ while True:
 
             if map_np[map_x, map_y] == 0:
                 map_np[map_x, map_y] = 1 # 갈 수 있음
-        
+                map_img[map_x, map_y, :] = 125
+    
+    img = cv2.reshape(map_img, (260,510))
+    cv2.imshow(img)
+    
     # plt.subplot(2,1,1)
     # plt.plot(dist_mid)
     # plt.title('Original')
@@ -210,4 +217,3 @@ while True:
 
     # plt.show()
 
-    
