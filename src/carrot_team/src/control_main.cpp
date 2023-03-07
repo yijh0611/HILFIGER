@@ -6,7 +6,7 @@
 #include "carrot_team/poi.h"
 #include "geometry_msgs/PoseStamped.h"
 
-#include "orientation.hpp"
+#include "carrot_team/orientation.hpp"
 #include "carrot_team/class.hpp"
 
 int main(int argc, char **argv)
