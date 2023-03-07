@@ -47,6 +47,8 @@ namespace AIMS {
 
         void pos_sub_callback(const geometry_msgs::PoseStamped::ConstPtr &msg);
 
+        void get_current_pos(float *current_position);
+
         void set_zoffset_yaw(float *target_poi_yaw);
     };
 }

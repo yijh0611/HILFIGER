@@ -92,6 +92,12 @@ void AIMS::Vehicle::pos_sub_callback(const geometry_msgs::PoseStamped::ConstPtr 
     current_position_[2] = msg->pose.position.z;
 }
 
+void AIMS::Vehicle::get_current_pos(float *current_position) {
+    for (int i=0; i<3; ++i) {
+        current_position[i] = current_position_[i];
+    }
+}
+
 void AIMS::Vehicle::set_zoffset_yaw(float *target_poi_yaw) {
 
     EulerAngles angle;
