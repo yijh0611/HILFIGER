@@ -177,7 +177,7 @@ while True:
             try:
                 if map_np[map_x, map_y] == 0:
                     map_np[map_x, map_y] = 2 # 갈 수 없음
-                    map_img[16 - map_x, map_y, 2] = 125
+                    map_img[map_x, 51- map_y, 2] = 125
             except:
                 # print('out of range')
                 pass
@@ -189,7 +189,7 @@ while True:
             try:
                 if map_np[map_x, map_y] == 0:
                     map_np[map_x, map_y] = 1 # 갈 수 있음
-                    map_img[16 - map_x, map_y, :] = 125
+                    map_img[map_x, 51 - map_y, :] = 125
             except:
                 # print('out of range')
                 pass
@@ -197,6 +197,7 @@ while True:
     mul = 20
     img = cv2.resize(map_img, dsize = (16 * mul,51 * mul))
     cv2.imshow('global map', img)
+    cv2.imshow('global map original', map_img)
     key = cv2.waitKey(10)
 
     if key == ord('d'):
