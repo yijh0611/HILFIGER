@@ -50,7 +50,7 @@ map_img = np.zeros((16, 51, 3))
 bridge = CvBridge() # Get drone image
 dist_mid = np.array([])
 drone_yaw = 0
-drone_pose = np.array([])
+drone_pose = np.array([0, 0, 0])
 time_is_map = time.time()
 
 def image_callback_depth(msg):
@@ -95,7 +95,7 @@ def get_pose(msg):
     if check == True:
         global time_is_map
         time_is_map = time.time()
-        
+
     drone_pose = tmp
     # print(drone_pose)
 
