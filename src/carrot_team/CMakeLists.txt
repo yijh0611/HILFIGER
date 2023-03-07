@@ -21,9 +21,9 @@ generate_messages(
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES go_to_poi
-#  CATKIN_DEPENDS geometry_msgs roscpp rospy trajectory_msgs
+   INCLUDE_DIRS include
+   LIBRARIES go_to_poi
+   CATKIN_DEPENDS geometry_msgs roscpp rospy trajectory_msgs
 #  DEPENDS system_lib
 )
 
@@ -32,7 +32,7 @@ catkin_package(
 ###########
 
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
   )
 
@@ -52,5 +52,14 @@ add_executable(sample
         src/sample.cpp
         )     
 target_link_libraries(sample
+        ${catkin_LIBRARIES}
+        )
+
+add_executable(control_main
+        src/control_main.cpp
+        src/modules/class.cpp
+        src/modules/orientation.cpp
+        )
+target_link_libraries(control_main
         ${catkin_LIBRARIES}
         )
