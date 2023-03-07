@@ -87,9 +87,15 @@ def get_pose(msg):
     global drone_pose
     tmp = np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
 
-    if drone_pose == tmp:
+    check = False
+    for i in range(3):
+        if drone_pose[i] != tmp[i]:
+            check = True
+
+    if check == True:
         global time_is_map
         time_is_map = time.time()
+        
     drone_pose = tmp
     # print(drone_pose)
 
