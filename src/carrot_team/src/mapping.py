@@ -195,9 +195,9 @@ while True:
                 pass
     
     mul = 20
-    img = cv2.resize(map_img, dsize = (16 * mul,51 * mul))
+    img = cv2.resize(map_img, dsize = (51 * mul, 16 * mul))
     cv2.imshow('global map', img)
-    cv2.imshow('global map original', map_img)
+    # cv2.imshow('global map original', map_img)
     key = cv2.waitKey(10)
 
     if key == ord('d'):
