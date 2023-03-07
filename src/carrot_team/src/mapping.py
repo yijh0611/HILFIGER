@@ -75,7 +75,7 @@ def yaw_rad(msg):
 
 def get_pose(msg):
     global drone_pose
-    drone_pose = msg.pose.position
+    drone_pose = np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
     print(drone_pose)
 
 def get_dist(d, n, w = 640, rad_cam = math.radians(58)):
