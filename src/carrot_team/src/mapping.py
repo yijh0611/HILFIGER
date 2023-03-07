@@ -80,6 +80,15 @@ def get_dist(d, n, w = 640, rad_cam = math.radians(58)):
 
     return dist_x, dist_y
 
+def get_r(d, n, w = 640, rad_cam = math.radians(58)):
+    w_half = w // 2
+    rad_cam_half = rad_cam / 2
+
+    r_x = (n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
+    r_y = (w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
+
+    return r_x, r_y
+
 rospy.init_node('mapping_node', anonymous=True)
 
 rospy.Subscriber('/red/camera/depth/image_raw', Image, image_callback_depth)
@@ -95,8 +104,8 @@ while True:
     # # rad_cam = deg_cam * math.pi / 180
     # rad_cam = math.radians(deg_cam)
     # rad_cam_half = rad_cam / 2
-    # w = 640
-    # w_half = 640 // 2
+    w = 640
+    w_half = 640 // 2
 
     wall_x = np.array([])
     wall_y = np.array([])
@@ -117,15 +126,26 @@ while True:
                 # dist_y = (d * w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
                 dist_x, dist_y = get_dist(d, n)
 
-                dist_x, dist_y = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
+                dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
 
-                wall_x = np.append(wall_x, dist_x)
-                wall_y = np.append(wall_y, dist_y)
-            
+                wall_x = np.append(wall_x, dist_x_rot)
+                wall_y = np.append(wall_y, dist_y_rot)
+            else:
+                dist_x, dist_y = get_dist(5, n)
+
             for j in range(1, 11):
-                dist_x, dist_y = get_dist(d / j, n)
-                open_x = np.append(open_x, dist_x)
-                open_y = np.append(open_y, dist_y)
+                rx, ry = get_r(d, n)
+
+                dx = rx * (d - j / ry)
+                dy = ry * (d - j / ry)
+                
+                if dy <= 0:
+                    break
+
+                dist_x_rot, dist_y_rot = rot.dot(np.array([dx, dy]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
+
+                open_x = np.append(open_x, dist_x_rot)
+                open_y = np.append(open_y, dist_y_rot)
             
             
 
