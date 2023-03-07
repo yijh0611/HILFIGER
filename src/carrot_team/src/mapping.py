@@ -51,7 +51,7 @@ bridge = CvBridge() # Get drone image
 dist_mid = np.array([])
 drone_yaw = 0
 drone_pose = np.array([])
-time_yaw = time.time()
+time_is_map = time.time()
 
 def image_callback_depth(msg):
 
@@ -79,13 +79,18 @@ def yaw_rad(msg):
     # print(msg.data)
     global drone_yaw
     if msg.data != drone_yaw:
-        global time_yaw
-        time_yaw = time.time()
+        global time_is_map
+        time_is_map = time.time()
     drone_yaw = msg.data
 
 def get_pose(msg):
     global drone_pose
-    drone_pose = np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
+    tmp = np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
+
+    if drone_pose == tmp:
+        global time_is_map
+        time_is_map = time.time()
+    drone_pose = tmp
     # print(drone_pose)
 
 def get_dist(d, n, w = 640, rad_cam = math.radians(58)):
@@ -167,7 +172,7 @@ while True:
                 open_y = np.append(open_y, dist_y_rot)
     
     # global mapping
-    if time.time() - time_yaw > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
+    if time.time() - time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
         # print(time.time() - time_yaw)
         # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
         # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
