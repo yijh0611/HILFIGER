@@ -177,9 +177,10 @@ while True:
             try:
                 if map_np[map_x, map_y] == 0:
                     map_np[map_x, map_y] = 2 # 갈 수 없음
-                    map_img[map_x, map_y, 2] = 125
+                    map_img[16 - map_x, map_y, 2] = 125
             except:
-                print('out of range')
+                # print('out of range')
+                pass
         
         for i in range(len(open_x)):
             map_x = int(drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
@@ -188,9 +189,10 @@ while True:
             try:
                 if map_np[map_x, map_y] == 0:
                     map_np[map_x, map_y] = 1 # 갈 수 있음
-                    map_img[map_x, map_y, :] = 125
+                    map_img[16 - map_x, map_y, :] = 125
             except:
-                print('out of range')
+                # print('out of range')
+                pass
     
     mul = 20
     img = cv2.resize(map_img, dsize = (16 * mul,51 * mul))
