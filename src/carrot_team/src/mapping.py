@@ -12,6 +12,7 @@ import rospy
 import threading
 
 from cv_bridge import CvBridge # Change ros image into opencv
+from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64 # get yaw
 
@@ -43,6 +44,7 @@ from std_msgs.msg import Float64 # get yaw
 bridge = CvBridge() # Get drone image
 dist_mid = np.array([])
 drone_yaw = 0
+drone_pose = np.array([])
 
 def image_callback_depth(msg):
 
@@ -71,6 +73,11 @@ def yaw_rad(msg):
     global drone_yaw
     drone_yaw = msg.data
 
+def get_pose(msg):
+    global drone_pose
+    drone_pose = msg.pose.position
+    print(drone_pose)
+
 def get_dist(d, n, w = 640, rad_cam = math.radians(58)):
     w_half = w // 2
     rad_cam_half = rad_cam / 2
@@ -93,6 +100,8 @@ rospy.init_node('mapping_node', anonymous=True)
 
 rospy.Subscriber('/red/camera/depth/image_raw', Image, image_callback_depth)
 rospy.Subscriber('/red/carrot/yaw', Float64, yaw_rad) # /red/uav/yaw 도 있는데, 값이 크게 차이나지는 않는거 같아서 그냥 이거 썼다.
+rospy.Subscriber('/red/carrot/pose', PoseStamped, get_pose)
+
 def ros_spin():
     rospy.spin()
 
