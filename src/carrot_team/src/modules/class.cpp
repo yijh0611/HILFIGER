@@ -14,14 +14,14 @@ Target_POI::Target_POI(ros::NodeHandle *nh) {
     poi_sub_ = nh->subscribe("/red/poi", 100, &Target_POI::poi_sub_callback, this);
 }
 
-void Target_POI::poi_sub_callback(const carrot_team::poi &msg) {
+void Target_POI::poi_sub_callback(const carrot_team::poi::ConstPtr &msg) {
     /* Temporary poi -> permanent poi */
     int poi_len = msg->poi.size();
     point_of_interests_.poi.resize(poi_len);
     passed_poi_.resize(poi_len);
 
     int _i;
-    for (_i = 0; _i < poi_len; ++i) {
+    for (_i = 0; _i < poi_len; ++_i) {
         point_of_interests_.poi[_i].x = msg->poi[_i].x;
         point_of_interests_.poi[_i].y = msg->poi[_i].y;
         point_of_interests_.poi[_i].z = msg->poi[_i].z;
@@ -42,31 +42,31 @@ void Target_POI::find_min_range(float *current_pos) {
     float range;
     float min_range = 10e9f;
 
-    int len = point_of_interests_->poi.size();
+    int len = point_of_interests_.poi.size();
     float temp_poi[3] = {0, 0, 0};
     int _i;
-    for (i=0; i<len; ++i) {
-        temp_poi[0] = point_of_interests_->poi[_i].x;
-        temp_poi[1] = point_of_interests_->poi[_i].y;
-        temp_poi[2] = point_of_interests_->poi[_i].z;
+    for (_i=0; _i<len; ++_i) {
+        temp_poi[0] = point_of_interests_.poi[_i].x;
+        temp_poi[1] = point_of_interests_.poi[_i].y;
+        temp_poi[2] = point_of_interests_.poi[_i].z;
         Target_POI::calculate_range(temp_poi, current_pos, &range, &target_yaw_);
 
         if (min_range >= range) {
             min_range = range;
-            target_idx_ = i;
+            target_idx_ = _i;
         }
     }
-    passed_poi[target_idx_] = true;
-    ROS_INFO("target index of poi is [%d]", target_idx);
+    passed_poi_[target_idx_] = true;
+    ROS_INFO("target index of poi is [%d]", target_idx_);
     ROS_INFO("target yaw of poi is [%f]", target_yaw_);
 }
 
 void Target_POI::get_target_poi(float *target_poi_yaw) {
     /* send the target poi to outside */
     if (target_idx_ >= 0) {
-        target_poi_yaw[0] = point_of_interests_->poi[target_idx_].x;
-        target_poi_yaw[1] = point_of_interests_->poi[target_idx_].y;
-        target_poi_yaw[2] = point_of_interests_->poi[target_idx_].z;
+        target_poi_yaw[0] = point_of_interests_.poi[target_idx_].x;
+        target_poi_yaw[1] = point_of_interests_.poi[target_idx_].y;
+        target_poi_yaw[2] = point_of_interests_.poi[target_idx_].z;
         target_poi_yaw[3] = target_yaw_;
     }
     else {
