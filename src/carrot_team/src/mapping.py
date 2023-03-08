@@ -233,22 +233,22 @@ while True:
 
     
     # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
-    # plt.subplot(3,1,1)
-    # plt.plot(dist_mid)
-    # plt.title('Original')
+    plt.subplot(3,1,1)
+    plt.plot(dist_mid)
+    plt.title('Original')
 
-    # plt.subplot(3,1,2)
-    # # plt.plot(arr_x, arr_y)
-    # plt.plot(wall_x, wall_y)
-    # plt.title('Converted_line')
+    plt.subplot(3,1,2)
+    # plt.plot(arr_x, arr_y)
+    plt.plot(wall_x, wall_y)
+    plt.title('Converted_line')
 
-    # plt.subplot(3,1,3)
-    # # plt.plot(arr_x, arr_y)
-    # plt.scatter(open_x, open_y)
-    # plt.scatter(wall_x, wall_y)
-    # plt.scatter(0, 0)
-    # plt.title('Converted_dot')
+    plt.subplot(3,1,3)
+    # plt.plot(arr_x, arr_y)
+    plt.scatter(open_x, open_y)
+    plt.scatter(wall_x, wall_y)
+    plt.scatter(0, 0)
+    plt.title('Converted_dot')
 
-    # plt.show()
+    plt.show()
 
 cv2.destroyAllWindows()
