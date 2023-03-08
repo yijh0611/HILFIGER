@@ -16,7 +16,6 @@ class Target_POI
     ros::Subscriber poi_sub_;
     carrot_team::poi point_of_interests_;
 
-    vector<bool> passed_poi_;
     int target_idx_;
     float target_yaw_;
 

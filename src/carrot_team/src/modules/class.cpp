@@ -18,7 +18,6 @@ void Target_POI::poi_sub_callback(const carrot_team::poi::ConstPtr &msg) {
     /* Temporary poi -> permanent poi */
     int poi_len = msg->poi.size();
     point_of_interests_.poi.resize(poi_len);
-    passed_poi_.resize(poi_len);
 
     int _i;
     for (_i = 0; _i < poi_len; ++_i) {
@@ -56,7 +55,6 @@ void Target_POI::find_min_range(float *current_pos) {
             target_idx_ = _i;
         }
     }
-    passed_poi_[target_idx_] = true;
     ROS_INFO("target index of poi is [%d]", target_idx_);
     ROS_INFO("target yaw of poi is [%f]", target_yaw_);
 }
