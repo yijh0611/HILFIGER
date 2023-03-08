@@ -123,6 +123,6 @@ Depth::Depth(ros::NodeHandle *nh) {
 }
 
 void Depth::depth_sub_callback(const sensor_msgs::Image::ConstPtr &msg) {
-    uit8_t *depth_value_ = msg->data;
+    uint8_t *depth_value_ = msg->data;
     ROS_INFO("[%d]", *depth_value_);
 }
