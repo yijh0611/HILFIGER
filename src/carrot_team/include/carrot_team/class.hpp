@@ -7,6 +7,7 @@
 #include "ros/ros.h"
 #include "carrot_team/poi.h"
 #include "geometry_msgs/PoseStamped.h"
+#include "sensor_msgs/Image.h"
 
 #include "carrot_team/orientation.hpp"
 
@@ -51,5 +52,22 @@ namespace AIMS {
         void set_zoffset_yaw(float *target_poi_yaw);
     };
 }
+
+
+class Depth
+{
+    private:
+    uint height_;
+    uint width_;
+    ros::Subscriber depth_sub_;
+    
+
+    public:  
+    Depth(ros::NodeHandle *nh);
+
+    void depth_sub_callback(const sensor_msgs::Image::ConstPtr &msg);
+
+};
+
 
 #endif

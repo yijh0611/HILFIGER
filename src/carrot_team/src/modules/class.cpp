@@ -4,6 +4,7 @@
 #include "ros/ros.h"
 #include "carrot_team/poi.h"
 #include "geometry_msgs/PoseStamped.h"
+#include "sensor_msgs/Image.h"
 
 #include "carrot_team/orientation.hpp"
 #include "carrot_team/class.hpp"
@@ -45,7 +46,7 @@ void Target_POI::find_min_range(float *current_pos) {
     float temp_poi[3] = {0, 0, 0};
     int _i;
     for (_i=0; _i<len; ++_i) {
-        temp_poi[0] = point_of_interests_.poi[_i].x;
+        temp_poi[0] = point_of_interests_.poi[_i].x;Ggg
         temp_poi[1] = point_of_interests_.poi[_i].y;
         temp_poi[2] = point_of_interests_.poi[_i].z;
         Target_POI::calculate_range(temp_poi, current_pos, &range, &target_yaw_);
@@ -114,6 +115,14 @@ void AIMS::Vehicle::set_zoffset_yaw(float *target_poi_yaw) {
 }
 
 
+Depth::Depth(ros::NodeHandle *nh) {
+    height_ = 640;
+    width_  = 480;
+    
+    depth_sub_ = nh->subscribe("/red/camera/depth/image_raw", 1000, &Depth::depth_sub_callback);
+}
 
-            
-        
+void Depth::depth_sub_callback(const sensor_msgs::Image::ConstPtr &msg) {
+    uit8_t *depth_value_ = msg->data;
+    ROS_INFO("[%d]", *depth_value_);
+}
