@@ -34,17 +34,23 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
-)
+  )
 
 add_executable(vehicle_to_poi
         src/vehicle_to_poi.cpp
-)
+        )
 target_link_libraries(vehicle_to_poi
         ${catkin_LIBRARIES}
-)
+        )
 add_executable(keyboard_control
-	src/keyboard_control.cpp
-	)
+        src/keyboard_control.cpp
+        )
 target_link_libraries(keyboard_control
-	${catkin_LIBRARIES}
-	)
+        ${catkin_LIBRARIES}
+        )
+add_executable(sample
+        src/sample.cpp
+        )     
+target_link_libraries(sample
+        ${catkin_LIBRARIES}
+        )
