@@ -119,7 +119,7 @@ Depth::Depth(ros::NodeHandle *nh) {
     height_ = 640;
     width_  = 480;
     
-    depth_sub_ = nh->subscribe("/red/camera/depth/image_raw", 1000, &Depth::depth_sub_callback);
+    depth_sub_ = nh->subscribe("/red/camera/depth/image_raw", 1000, &Depth::depth_sub_callback, this);
 }
 
 void Depth::depth_sub_callback(const sensor_msgs::Image::ConstPtr &msg) {
