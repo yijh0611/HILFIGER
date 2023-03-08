@@ -100,11 +100,17 @@ def get_pose(msg):
     # print(drone_pose)
 
 def get_dist(d, n, w = 640, rad_cam = math.radians(58)):
-    w_half = w // 2
-    rad_cam_half = rad_cam / 2
+    # w_half = w // 2
+    # rad_cam_half = rad_cam / 2
 
-    dist_x = (d * n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
-    dist_y = (d * w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
+    # dist_x = (d * n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
+    # dist_y = (d * w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
+
+    # 새로운 알고리즘
+    rad = rad_cam * n / w
+
+    dist_x = d * math.tan(rad)
+    dist_y = d
 
     return dist_x, dist_y
 
