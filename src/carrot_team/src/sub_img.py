@@ -10,12 +10,14 @@ import rospy
 from cv_bridge import CvBridge # Change ros image into opencv
 from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64
+from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import String
 
 # distance publisher
 pub_d = rospy.Publisher('/carrot_team/distance', Float64 , queue_size = 10)
 pub_lr = rospy.Publisher('/carrot_team/lr', String, queue_size = 10)
 pub_ud = rospy.Publisher('/carrot_team/ud', String, queue_size = 10)
+pub_distance = rospy.Publisher('/carrot_team/distance_array', Float64MultiArray, queue_size = 10)
 
 bridge = CvBridge() # Get drone image
 bridge_2 = CvBridge() # Get drone depth map
@@ -68,6 +70,11 @@ def image_callback_depth(msg):
         dist_pub = 10
     else:
         dist_pub = dist_mid
+    
+    
+    # publish distance data
+    img_depth_ori[np.isnan(img_depth_ori)] = 10
+    pub_distance.publish(img_depth_ori)
     
     # publish distance
     pub_d.publish(dist_pub)
