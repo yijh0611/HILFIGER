@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   trajectory_msgs
   message_generation
   std_msgs
+  sensor_msgs
 )
 
 add_message_files(
@@ -23,7 +24,7 @@ generate_messages(
 catkin_package(
    INCLUDE_DIRS include
    LIBRARIES go_to_poi
-   CATKIN_DEPENDS geometry_msgs roscpp rospy trajectory_msgs
+   CATKIN_DEPENDS geometry_msgs roscpp rospy trajectory_msgs sensor_msgs
 #  DEPENDS system_lib
 )
 
