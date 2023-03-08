@@ -73,8 +73,14 @@ def image_callback_depth(msg):
     
     
     # publish distance data
-    img_depth_ori[np.isnan(img_depth_ori)] = 10
-    pub_distance.publish(img_depth_ori)
+    img_data = img_depth_ori * 1
+    
+    img_data[np.isnan(img_data)] = 10.0
+
+    img_array = Float64MultiArray()
+    img_array.data = img_data
+
+    pub_distance.publish(img_array)
     
     # publish distance
     pub_d.publish(dist_pub)
