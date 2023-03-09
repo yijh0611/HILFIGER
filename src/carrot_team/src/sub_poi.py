@@ -9,6 +9,7 @@ print(1)
 rospy.init_node('sub_poi', anonymous=True)
 rospy.Subscriber('/red/poi', poi, get_poi)
 
+# <<<<<<< hak
 rospy.spin()
 
 
@@ -92,3 +93,6 @@ rospy.spin()
 
 # pub.publish(PoIArray)
 # rospy.sleep(5)
+# =======
+# rospy.spin()
+# >>>>>>> main
