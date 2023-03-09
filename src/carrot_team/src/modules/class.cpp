@@ -114,7 +114,7 @@ void AIMS::Vehicle::set_zoffset_yaw(float *target_poi_yaw) {
     ROS_INFO("Setting zoffset and yaw to target");
 }
 
-
+/*
 Depth::Depth(ros::NodeHandle *nh) {
     height_ = 640;
     width_  = 480;
@@ -126,3 +126,4 @@ void Depth::depth_sub_callback(const sensor_msgs::Image::ConstPtr &msg) {
     uint8_t *depth_value_ = msg->data;
     ROS_INFO("[%d]", *depth_value_);
 }
+*/
