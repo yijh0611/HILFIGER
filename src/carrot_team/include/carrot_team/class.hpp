@@ -53,7 +53,7 @@ namespace AIMS {
     };
 }
 
-
+/*
 class Depth
 {
     private:
@@ -68,6 +68,6 @@ class Depth
     void depth_sub_callback(const sensor_msgs::Image::ConstPtr &msg);
 
 };
-
+*/
 
 #endif
