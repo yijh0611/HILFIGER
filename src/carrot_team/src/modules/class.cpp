@@ -5,6 +5,7 @@
 #include "carrot_team/poi.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "sensor_msgs/Image.h"
+#include "std_msgs/Float64MultiArray.h"
 
 #include "carrot_team/orientation.hpp"
 #include "carrot_team/class.hpp"
@@ -114,16 +115,18 @@ void AIMS::Vehicle::set_zoffset_yaw(float *target_poi_yaw) {
     ROS_INFO("Setting zoffset and yaw to target");
 }
 
-/*
+
 Depth::Depth(ros::NodeHandle *nh) {
     height_ = 640;
     width_  = 480;
-    
+    depth_size_ = (640*480);
+    for (int i=0; i<depth_size_; ++i) { depth_array_[i] = 0; }
     depth_sub_ = nh->subscribe("/red/camera/depth/image_raw", 1000, &Depth::depth_sub_callback, this);
 }
 
-void Depth::depth_sub_callback(const sensor_msgs::Image::ConstPtr &msg) {
-    uint8_t *depth_value_ = msg->data;
-    ROS_INFO("[%d]", *depth_value_);
+void Depth::depth_sub_callback(const std_msgs::Float64MultiArray::ConstPtr &msg) {
+    for (int i=0; i<depth_size_; ++i) {
+        depth_array_[i] = msg->data[i];
+    }
+    ROS_INFO("(320, 240): [%f]", depth_array_[320*240]);
 }
-*/

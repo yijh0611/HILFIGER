@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
     AIMS::Vehicle carrot_vehicle = AIMS::Vehicle(&nh);
     Target_POI target_poi = Target_POI(&nh);
-
+    Depth depth = Depth(&nh);
     ros::Rate rate(1);
     while (ros::ok()) {
         if (where) {

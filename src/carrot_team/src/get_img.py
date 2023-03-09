@@ -10,11 +10,12 @@ import std_msgs.msg import Float64MultiArray
 
 def depth_callback(msg):
     global cv_depth
-    cv_depth = bridge_2.imgmsg_to_cv2(msg, desired_encoding='32FC1')
+    cv_depth = bridge.imgmsg_to_cv2(msg, desired_encoding='32FC1')
     assert cv_depth.size == (640*480)
-
+    depth_1D = np.ravel(cv_depth)
+    print(depth_1D)
     array_msg = Float64MultiArray()
-    array_msg.data = cv_depth
+    array_msg.data = list(depth_1D)
     depth_pub.publish(array_msg)
 
     cv2.imshow("Depth_image", cv_depth)
@@ -28,6 +29,6 @@ if __name__ == "__main__":
     cv_depth = np.empty(shape=[0]);
 
     rospy.init_node("get_img", anonymous=False)
-    rospy.Subscriber("/red/camera/depth/image_raw", Image, depth_callback)
     depth_pub = rospy.Publishser("/carrot_team/depth_array", Float64MultiArray, queue_size = 10)
+    rospy.Subscriber("/red/camera/depth/image_raw", Image, depth_callback)
     rospy.spin()

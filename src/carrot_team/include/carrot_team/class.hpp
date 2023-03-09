@@ -8,6 +8,7 @@
 #include "carrot_team/poi.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "sensor_msgs/Image.h"
+#include "std_msgs/Float64MultiArray.h"
 
 #include "carrot_team/orientation.hpp"
 
@@ -53,21 +54,19 @@ namespace AIMS {
     };
 }
 
-/*
+
 class Depth
 {
     private:
     uint height_;
     uint width_;
+    uint depth_size_;
     ros::Subscriber depth_sub_;
+    double depth_array_[640*480];
     
-
     public:  
     Depth(ros::NodeHandle *nh);
 
-    void depth_sub_callback(const sensor_msgs::Image::ConstPtr &msg);
-
+    void depth_sub_callback(const std_msgs::Float64MultiArray::ConstPtr &msg);
 };
-*/
-
 #endif
