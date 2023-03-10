@@ -56,6 +56,7 @@ def image_callback_depth(msg):
     tmp = np.array(bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')) * 1
     
     global img_depth
+    img_depth = tmp
     img_depth[np.isnan(tmp)] = 10.0
 
     # h_half = 480 // 2
@@ -150,20 +151,9 @@ while True:
 
     # Rotation matrix
     rot = np.array([[math.cos(drone_yaw), -1 * math.sin(drone_yaw)],[math.sin(drone_yaw), math.cos(drone_yaw)]])
-
-    # 세로방향 각이 알파
-    # 가로 방향의 각이 베타
-
-    # for h in range(len(img_depth)):
-    #     if 60 < h and 420 > h:
-    #         for w in range(len(img_depth)):
-    #             if w > 64 and w < 576:
-    #             # 화면의 가운데만 사용
-    #                 h = h_half - h
-    #                 w = w - w_half
     
     for i in range(60,420):
-        if i  == 240:
+        if i == 240:
             for j in range(64, 576):
                 h = h_half - i
                 if h <= 0:
@@ -182,9 +172,14 @@ while True:
                 wall_y = np.append(wall_y, dist_y_rot)
                 wall_z = np.append(wall_z, dist_z)
 
-                # # Open mapping
-                # for k in range(1,11):
-                    # 열린 공간을 1m 정도의 간격으로 Plot 하기 -> 3차원의 경우 그냥 하면 안될 듯 하다.
+                # Open space mapping
+                n = 5 # Resolution (How many)
+                for k in range(1,n + 1):
+                    open_x = np.append(open_x, dist_x_rot / k)
+                    open_y = np.append(open_y, dist_y_rot / k)
+                    open_z = np.append(open_z, dist_z_rot / k)
+                    # 1m 간격으로 Plot 하는 방법 생각해보기
+
 
     # # global mapping # 아직 안짜서 수정 필요
     # if time.time() - time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
@@ -233,103 +228,5 @@ while True:
     plt.title('Converted_dot')
 
     plt.show()
-
-
-    '''
-    이전 코드
-    '''
-
-    # for i, d in enumerate(dist_mid):
-    #     if (64 < i) and (i < 576):
-    #         n = i - (w_half - 1) # 처음 시작하는 값을 -319으로 만들기 위함.
-            
-    #         if d != 10: # 뚫려있을때는 안하기
-    #             # dist_x = (d * n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
-    #             # dist_y = (d * w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
-    #             dist_x, dist_y = get_dist(d, n)
-
-    #             dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
-
-    #             wall_x = np.append(wall_x, dist_x_rot)
-    #             wall_y = np.append(wall_y, dist_y_rot)
-    #         else:
-    #             dist_x, dist_y = get_dist(5, n)
-
-    #         for j in range(1, 11):
-    #             rx, ry = get_r(d, n)
-
-    #             dx = rx * (d - j / ry)
-    #             dy = ry * (d - j / ry)
-                
-    #             if dy <= 0:
-    #                 break
-
-    #             dist_x_rot, dist_y_rot = rot.dot(np.array([dx, dy]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
-
-    #             open_x = np.append(open_x, dist_x_rot)
-    #             open_y = np.append(open_y, dist_y_rot)
     
-    # # global mapping
-    # if time.time() - time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
-    #     # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
-    #     # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
-    #     for i in range(len(wall_x)):
-    #         map_x = int(drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
-    #         map_y = int(drone_pose[1] - wall_x[i])
-            
-    #         try:
-    #             if map_np[map_x, map_y] == 0:
-    #                 map_np[map_x, map_y] = 2 # 갈 수 없음
-    #                 map_img[16 - map_x, 51- map_y, 2] = 125
-    #         except:
-    #             pass
-        
-    #     for i in range(len(open_x)):
-    #         map_x = int(drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
-    #         map_y = int(drone_pose[1] - open_x[i])
-
-    #         try:
-    #             if map_np[map_x, map_y] == 0:
-    #                 map_np[map_x, map_y] = 1 # 갈 수 있음
-    #                 map_img[16 - map_x, 51 - map_y, :] = 125
-    #         except:
-    #             pass
-    
-    # mul = 20
-    # img = cv2.resize(map_img, dsize = (51 * mul, 16 * mul))
-    # cv2.imshow('global map', img)
-    # key = cv2.waitKey(10)
-
-    # if key == ord('d'):
-    #     break
-
-    # plt.subplot(2,1,1)
-    # plt.plot(dist_mid)
-    # plt.title('Original')
-
-    # plt.subplot(2,1,2)
-    # # plt.plot(arr_x, arr_y)
-    # plt.scatter(arr_x, arr_y)
-    # plt.title('Converted')
-
-    
-    # # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
-    # plt.subplot(3,1,1)
-    # plt.plot(dist_mid)
-    # plt.title('Original')
-
-    # plt.subplot(3,1,2)
-    # # plt.plot(arr_x, arr_y)
-    # plt.plot(wall_x, wall_y)
-    # plt.title('Converted_line')
-
-    # plt.subplot(3,1,3)
-    # # plt.plot(arr_x, arr_y)
-    # plt.scatter(open_x, open_y)
-    # plt.scatter(wall_x, wall_y)
-    # plt.scatter(0, 0)
-    # plt.title('Converted_dot')
-
-    # plt.show()
-
 cv2.destroyAllWindows()
