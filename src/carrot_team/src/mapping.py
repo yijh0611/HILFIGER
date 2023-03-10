@@ -219,11 +219,13 @@ while True:
 
     plt.subplot(2,1,1)
     plt.plot(wall_x, wall_y)
+    plt.grid(True)
     plt.title('Converted_line')
 
     plt.subplot(2,1,2)
     plt.scatter(open_x, open_y)
     plt.scatter(wall_x, wall_y)
+    plt.grid(True)
     plt.scatter(0, 0)
     plt.title('Converted_dot')
 
