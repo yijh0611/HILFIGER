@@ -163,27 +163,28 @@ while True:
     #                 w = w - w_half
     
     for i in range(60,420):
-        for j in range(64, 576):
-            h = h_half - i
-            if h <= 0:
-                h -= 1
-            w = j - w_half
-            if w >= 0:
-                w += 1
-            
-            d = img_depth[i][j]
+        if i  == 240:
+            for j in range(64, 576):
+                h = h_half - i
+                if h <= 0:
+                    h -= 1
+                w = j - w_half
+                if w >= 0:
+                    w += 1
+                
+                d = img_depth[i][j]
 
-            dist_x, dist_y, dist_z = get_dist(img_depth[i][j], w, h)
+                dist_x, dist_y, dist_z = get_dist(img_depth[i][j], w, h)
 
-            dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
+                dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
 
-            wall_x = np.append(wall_x, dist_x_rot)
-            wall_y = np.append(wall_y, dist_y_rot)
-            wall_z = np.append(wall_z, dist_z)
+                wall_x = np.append(wall_x, dist_x_rot)
+                wall_y = np.append(wall_y, dist_y_rot)
+                wall_z = np.append(wall_z, dist_z)
 
-            # # Open mapping
-            # for k in range(1,11):
-                # 열린 공간을 1m 정도의 간격으로 Plot 하기 -> 3차원의 경우 그냥 하면 안될 듯 하다.
+                # # Open mapping
+                # for k in range(1,11):
+                    # 열린 공간을 1m 정도의 간격으로 Plot 하기 -> 3차원의 경우 그냥 하면 안될 듯 하다.
 
     # # global mapping # 아직 안짜서 수정 필요
     # if time.time() - time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
