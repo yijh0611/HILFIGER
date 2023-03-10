@@ -151,9 +151,9 @@ while True:
             dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
 
             isNaN = np.isnan(d)
-            if is_NaN:
+            if isNaN:
                 d = 10
-                
+
             elif d != 10:
                 wall_x = np.append(wall_x, dist_x_rot)
                 wall_y = np.append(wall_y, dist_y_rot)
@@ -210,19 +210,23 @@ while True:
     # plt.plot(wall_x, wall_y)
     # plt.grid(True)
     # plt.title('Converted_line')
-    plt.subplot(2,1,1)
-    fig = plt.figure()
-    ax = fig.add_subplot(projection = '3d')
-    ax.scatter(wall_x, wall_y, wall_z)
-    # plt.grid(True)
-    plt.title('3D')
 
-    plt.subplot(2,1,2)
-    plt.scatter(open_x, open_y)
-    plt.scatter(wall_x, wall_y)
-    plt.grid(True)
-    plt.scatter(0, 0)
-    plt.title('2D')
+
+    # plt.subplot(2,1,1)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(121, projection = '3d')
+    ax.scatter(wall_x, wall_y, wall_z, marker = 'o')
+    # plt.grid(True)
+    ax.title('3D')
+
+    # plt.subplot(2,1,2)
+    ax = fig.add_subplot(122)
+    ax.scatter(open_x, open_y)
+    ax.scatter(wall_x, wall_y)
+    ax.grid(True)
+    ax.scatter(0, 0)
+    ax.title('2D')
 
     plt.show()
 
