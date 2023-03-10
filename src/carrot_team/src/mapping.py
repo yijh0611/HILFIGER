@@ -14,6 +14,7 @@ import time
 
 from cv_bridge import CvBridge # Change ros image into opencv
 from geometry_msgs.msg import PoseStamped
+from mpl_toolkits.mplot3d import Axes3D
 from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64 # get yaw
 
@@ -215,18 +216,18 @@ while True:
     # plt.subplot(2,1,1)
 
     fig = plt.figure()
-    ax = fig.add_subplot(121, projection = '3d')
+    ax = fig.add_subplot(1, 2, 1, projection = '3d')
     ax.scatter(wall_x, wall_y, wall_z, marker = 'o')
     # plt.grid(True)
-    ax.title('3D')
+    # ax.title('3D')
 
     # plt.subplot(2,1,2)
-    ax = fig.add_subplot(122)
+    ax = fig.add_subplot(1, 2, 2)
     ax.scatter(open_x, open_y)
     ax.scatter(wall_x, wall_y)
     ax.grid(True)
     ax.scatter(0, 0)
-    ax.title('2D')
+    # ax.title('2D')
 
     plt.show()
 
