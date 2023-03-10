@@ -181,39 +181,39 @@ while True:
                     # 1m 간격으로 Plot 하는 방법 생각해보기
 
 
-    # # global mapping # 아직 안짜서 수정 필요
-    # if time.time() - time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
-    #     # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
-    #     # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
-    #     for i in range(len(wall_x)):
-    #         map_x = int(drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
-    #         map_y = int(drone_pose[1] - wall_x[i])
+    # global mapping # 3D 형태로 수정 필요
+    if time.time() - time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
+        # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
+        # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
+        for i in range(len(wall_x)):
+            map_x = int(drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
+            map_y = int(drone_pose[1] - wall_x[i])
             
-    #         try:
-    #             if map_np[map_x, map_y] == 0:
-    #                 map_np[map_x, map_y] = 2 # 갈 수 없음
-    #                 map_img[16 - map_x, 51- map_y, 2] = 125
-    #         except:
-    #             pass
+            try:
+                if map_np[map_x, map_y] == 0:
+                    map_np[map_x, map_y] = 2 # 갈 수 없음
+                    map_img[16 - map_x, 51- map_y, 2] = 125
+            except:
+                pass
         
-    #     for i in range(len(open_x)):
-    #         map_x = int(drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
-    #         map_y = int(drone_pose[1] - open_x[i])
+        for i in range(len(open_x)):
+            map_x = int(drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
+            map_y = int(drone_pose[1] - open_x[i])
 
-    #         try:
-    #             if map_np[map_x, map_y] == 0:
-    #                 map_np[map_x, map_y] = 1 # 갈 수 있음
-    #                 map_img[16 - map_x, 51 - map_y, :] = 125
-    #         except:
-    #             pass
+            try:
+                if map_np[map_x, map_y] == 0:
+                    map_np[map_x, map_y] = 1 # 갈 수 있음
+                    map_img[16 - map_x, 51 - map_y, :] = 125
+            except:
+                pass
 
-    # mul = 20
-    # img = cv2.resize(map_img, dsize = (51 * mul, 16 * mul))
-    # cv2.imshow('global map', img)
-    # key = cv2.waitKey(10)
+    mul = 20
+    img = cv2.resize(map_img, dsize = (51 * mul, 16 * mul))
+    cv2.imshow('global map', img)
+    key = cv2.waitKey(10)
 
-    # if key == ord('d'):
-    #     break
+    if key == ord('q'):
+        break
 
     # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
 
