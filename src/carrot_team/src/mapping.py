@@ -175,9 +175,9 @@ while True:
                 # Open space mapping
                 n = 5 # Resolution (How many)
                 for k in range(1,n + 1):
-                    open_x = np.append(open_x, dist_x_rot / k)
-                    open_y = np.append(open_y, dist_y_rot / k)
-                    open_z = np.append(open_z, dist_z_rot / k)
+                    open_x = np.append(open_x, dist_x_rot * k / n)
+                    open_y = np.append(open_y, dist_y_rot * k / n)
+                    open_z = np.append(open_z, dist_z * k / n)
                     # 1m 간격으로 Plot 하는 방법 생각해보기
 
 
@@ -222,11 +222,11 @@ while True:
     plt.title('Converted_line')
 
     plt.subplot(2,1,2)
-    # plt.scatter(open_x, open_y)
+    plt.scatter(open_x, open_y)
     plt.scatter(wall_x, wall_y)
     plt.scatter(0, 0)
     plt.title('Converted_dot')
 
     plt.show()
-    
+
 cv2.destroyAllWindows()
