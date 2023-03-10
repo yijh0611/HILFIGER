@@ -146,16 +146,16 @@ while True:
                 w += 1
             
             d = img_depth[i][j]
-
-            dist_x, dist_y, dist_z = get_dist(img_depth[i][j], w, h)
-
-            dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
-
             isNaN = np.isnan(d)
             if isNaN:
                 d = 10
 
-            elif d != 10:
+            # dist_x, dist_y, dist_z = get_dist(img_depth[i][j], w, h)
+            dist_x, dist_y, dist_z = get_dist(d, w, h)
+
+            dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
+
+            if d != 10:
                 wall_x = np.append(wall_x, dist_x_rot)
                 wall_y = np.append(wall_y, dist_y_rot)
                 wall_z = np.append(wall_z, dist_z)
