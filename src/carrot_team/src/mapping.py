@@ -21,8 +21,9 @@ from std_msgs.msg import Float64 # get yaw
 # 클래스 형태로 바꿔서 전역변수 없애기
 
 # 시작할때는 초기값 설정
-map_np = np.zeros((16, 51)) # 드론이 시작할때 바라보는 방향은 x이다. 드론의 왼쪽이 y이다.
-map_img = np.zeros((16, 51, 3))
+# map_np = np.zeros((16, 51)) # 드론이 시작할때 바라보는 방향은 x이다. 드론의 왼쪽이 y이다.
+map_np = np.zeros((16, 51, 26))
+map_img = np.zeros((16, 51, 26, 3))
 
 # 0은 미탐색, 1은 갈 수 있음, 2는 갈 수 없음
 # 색칠할때는
@@ -59,22 +60,6 @@ def image_callback_depth(msg):
     img_depth = tmp
     img_depth[np.isnan(tmp)] = 10.0
 
-    # h_half = 480 // 2
-    # global dist_mid
-    # dist_mid = img_depth[h_half, :]
-
-    # for i, n in enumerate(dist_mid):
-    #     isNaN = np.isnan(n)
-    #     if isNaN:
-    #         dist_mid[i] = 10
-    
-    # global plt
-    # plt.plot(dist_mid)
-    # plt.show()
-    # plt.savefig(f'./line_plot.jpg', dpi=300)
-    # img = cv2.imread(f'./line_plot.jpg')
-    # cv2.imshow('image', img)
-
 def yaw_rad(msg):
     global drone_yaw
     if msg.data != drone_yaw:
@@ -98,13 +83,10 @@ def get_pose(msg):
     drone_pose = tmp
 
 def get_dist(d, n, z, w = 640, h = 480, rad_cam_w = math.radians(87), rad_cam_h = math.radians(58)): # 앞에거가 원래 58이었음.
-    # rad_w = rad_cam_w * n / w
-    # rad_h = rad_cam_h * z / h
+
     w_half = w // 2
     h_half = h // 2
 
-    # beta = # w angle
-    # alpha = # h angle
     rad_w = math.atan((math.tan(rad_cam_w / 2) * n) / w_half)
     rad_h = math.atan((math.tan(rad_cam_h / 2) * z) / h_half)
 
@@ -153,27 +135,27 @@ while True:
     rot = np.array([[math.cos(drone_yaw), -1 * math.sin(drone_yaw)],[math.sin(drone_yaw), math.cos(drone_yaw)]])
     
     for i in range(60,420):
-        if i == 240:
-            for j in range(64, 576):
-                h = h_half - i
-                if h <= 0:
-                    h -= 1
-                w = j - w_half
-                if w >= 0:
-                    w += 1
-                
-                d = img_depth[i][j]
+        for j in range(64, 576):
+            h = h_half - i
+            if h <= 0:
+                h -= 1
+            w = j - w_half
+            if w >= 0:
+                w += 1
+            
+            d = img_depth[i][j]
 
-                dist_x, dist_y, dist_z = get_dist(img_depth[i][j], w, h)
+            dist_x, dist_y, dist_z = get_dist(img_depth[i][j], w, h)
 
-                dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
+            dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
 
-                if d != 10:
-                    wall_x = np.append(wall_x, dist_x_rot)
-                    wall_y = np.append(wall_y, dist_y_rot)
-                    wall_z = np.append(wall_z, dist_z)
+            if d != 10:
+                wall_x = np.append(wall_x, dist_x_rot)
+                wall_y = np.append(wall_y, dist_y_rot)
+                wall_z = np.append(wall_z, dist_z)
 
-                # Open space mapping
+            # Open space mapping
+            if i == 240:
                 n = 5 # Resolution (How many)
                 for k in range(1,n + 1):
                     open_x = np.append(open_x, dist_x_rot * k / n)
@@ -189,11 +171,12 @@ while True:
         for i in range(len(wall_x)):
             map_x = int(drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
             map_y = int(drone_pose[1] - wall_x[i])
+            map_z = int(drone_pose[2] + wall_z[i])
             
             try:
-                if map_np[map_x, map_y] == 0:
-                    map_np[map_x, map_y] = 2 # 갈 수 없음
-                    map_img[16 - map_x, 51- map_y, 2] = 125
+                if map_np[map_x, map_y, map_z] == 0:
+                    map_np[map_x, map_y, map_z] = 2 # 갈 수 없음
+                    map_img[16 - map_x, 51- map_y, map_z, 2] = 125 # 빨간색
             except:
                 pass
         
@@ -204,12 +187,12 @@ while True:
             try:
                 if map_np[map_x, map_y] == 0:
                     map_np[map_x, map_y] = 1 # 갈 수 있음
-                    map_img[16 - map_x, 51 - map_y, :] = 125
+                    map_img[16 - map_x, 51 - map_y, map_z, :] = 125
             except:
                 pass
 
     mul = 20
-    img = cv2.resize(map_img, dsize = (51 * mul, 16 * mul))
+    img = cv2.resize(map_img[:, :, int(drone_pose[2]), :], dsize = (51 * mul, 16 * mul))
     cv2.imshow('global map', img)
     key = cv2.waitKey(10)
 
