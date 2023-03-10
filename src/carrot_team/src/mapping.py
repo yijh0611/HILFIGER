@@ -134,7 +134,8 @@ while True:
     # Rotation matrix
     rot = np.array([[math.cos(drone_yaw), -1 * math.sin(drone_yaw)],[math.sin(drone_yaw), math.cos(drone_yaw)]])
     
-    for i in range(60,420):
+    # for i in range(60,420):
+    for i in range(200, 300):
         for j in range(64, 576):
             h = h_half - i
             if h <= 0:
@@ -201,17 +202,21 @@ while True:
 
     # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
 
+    # plt.subplot(2,1,1)
+    # plt.plot(wall_x, wall_y)
+    # plt.grid(True)
+    # plt.title('Converted_line')
     plt.subplot(2,1,1)
-    plt.plot(wall_x, wall_y)
+    plt.scatter(wall_x, wall_y, wall_z)
     plt.grid(True)
-    plt.title('Converted_line')
+    plt.title('3D')
 
     plt.subplot(2,1,2)
     plt.scatter(open_x, open_y)
     plt.scatter(wall_x, wall_y)
     plt.grid(True)
     plt.scatter(0, 0)
-    plt.title('Converted_dot')
+    plt.title('2D')
 
     plt.show()
 
