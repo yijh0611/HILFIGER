@@ -140,7 +140,7 @@ if __name__ == "__main__" :
                 if w >= 0:
                     w += 1
                 
-                d = img_depth[i][j]
+                d = mp.img_depth[i][j]
                 isNaN = np.isnan(d)
                 if isNaN:
                     d = 10
@@ -194,7 +194,7 @@ if __name__ == "__main__" :
 
         mul = 20
         img = cv2.resize(mp.map_img[:, :, int(mp.drone_pose[2]), :], dsize = (51 * mul, 16 * mul))
-        cv2.imshow('global map', img)
+        cv2.imshow('Global map', img)
         key = cv2.waitKey(10)
 
         if key == ord('q'):
