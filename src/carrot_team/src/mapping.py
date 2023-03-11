@@ -212,7 +212,7 @@ if __name__ == "__main__" :
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 2, 1, projection = '3d')
-        ax.scatter(wall_x, wall_y, wall_z, marker = 'o')
+        ax.scatter(wall_x, wall_y, wall_z, marker = '.')
         # plt.grid(True)
         # ax.title('3D')
 
