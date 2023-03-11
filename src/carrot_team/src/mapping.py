@@ -110,7 +110,7 @@ class mapping(self):
         return r_x, r_y
 
 
-if __name__ = "__main__" :
+if __name__ == "__main__" :
     mp = mapping()
 
     while True:
