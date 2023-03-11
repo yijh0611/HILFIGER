@@ -167,6 +167,7 @@ if __name__ == "__main__" :
 
         # global mapping # 3D 형태로 수정 필요
         if time.time() - mp.time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
+            print('Global mapping')
             # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
             # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
             for i in range(len(wall_x)):
