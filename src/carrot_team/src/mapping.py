@@ -19,7 +19,7 @@ from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64 # get yaw
 
 
-class mapping(self):
+class mapping:
     def __init__(self):
         # Set variables
         self.map_np = np.zeros((16, 51, 26)) # x : Initial drone's orientation, y : left
@@ -62,7 +62,7 @@ class mapping(self):
     def image_callback_depth(self, msg):
 
         # get depth image
-        tmp = np.array(bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')) * 1
+        tmp = np.array(self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')) * 1
         
         self.img_depth = tmp
         self.img_depth[np.isnan(tmp)] = 10.0
