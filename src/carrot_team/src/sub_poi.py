@@ -19,7 +19,7 @@ class GetPOI:
         rospy.Subscriber('/carrot_team/req_poi', Int32, self.sub_poi_when_request)
         
         # poi publisher
-        pub_poi = rospy.Publisher('/carrot_team/poi', Float32MultiArray, queue_size=10)
+        self.pub_poi = rospy.Publisher('/carrot_team/poi', Float32MultiArray, queue_size=10)
 
         rospy.spin()
         # t = threading.Thread(target = self.ros_spin)
