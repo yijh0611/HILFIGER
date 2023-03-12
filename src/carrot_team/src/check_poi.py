@@ -6,14 +6,14 @@ import threading
 import time
 
 from std_msgs.msg import Int32
-from std_msgs.msg import MultiArrayFloat32
+from std_msgs.msg import Float32MultiArray
 
 class Search:
     def __init__(self):
         self.poi = np.array([])
 
         rospy.init_node('search_poi', anonymous=True)
-        rospy.subscriber('/carrot_team/req_poi', MultiArrayFloat32, self.get_poi)
+        rospy.subscriber('/carrot_team/req_poi', Float32MultiArray, self.get_poi)
 
         self.pub_get_poi = rospy.Publisher('/carrot_team/req_poi', Int32, queue_size=10)
 
@@ -50,4 +50,4 @@ if __name__ == "__main__":
 
     print(ctrl.poi)
     print(np.shape(ctrl.poi))
-    
+
