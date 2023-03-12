@@ -78,6 +78,7 @@ class mapping:
 
             self.w_list = np.append(self.w_list, rad_w)
         
+        self.time_total = time.time()
         
         rospy.init_node('mapping_node', anonymous=True)
 
@@ -239,6 +240,8 @@ if __name__ == "__main__" :
         ax.scatter(0, 0)
         # ax.title('2D')
 
+        print(time.time() - mp.time_total)
         plt.show()
-
+        mp.time_total = time.time()
+        
     cv2.destroyAllWindows()
