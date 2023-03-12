@@ -33,13 +33,16 @@ class GetPOI:
             tmp = np.append(tmp, msg.poi[i].z)
 
             self.poi = np.append(self.poi, tmp)
+
+            # Print End
+            print(self.poi)
     
     def sub_poi_when_request(self, msg):
         
 
         if msg.data < len(self.poi):
             # data to publish
-            poi_msg = MultiArrayFloat32()
+            poi_msg = Float32MultiArray()
             poi_msg.data = self.poi[msg.data]
             
             # publish data
