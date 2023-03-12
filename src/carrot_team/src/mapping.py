@@ -22,8 +22,12 @@ from std_msgs.msg import Float64 # get yaw
 class mapping:
     def __init__(self):
         # Set variables
-        self.map_np = np.zeros((16, 51, 26)) # x : Initial drone's orientation, y : left
-        self.map_img = np.zeros((16, 51, 26, 3))
+        self.x_size = 21 # 15 in introduction
+        self.y_size = 51 # 50 in introduction
+        self.z_size = 26 # 25 in introduction
+        
+        self.map_np = np.zeros((self.x_size, self.y_size, self.z_size)) # x : Initial drone's orientation, y : left
+        self.map_img = np.zeros((self.x_size, self.y_size, self.z_size, 3))
         # 0 : Unknown, 1 : Open, 2 : Wall
         # Color :
         # Black : Unknown, White : Open, Red : Wall
@@ -41,16 +45,17 @@ class mapping:
         현재는 2D 이기 때문에 16 * 51으로 만들 계획이다.
 
         '''
+
+        self.w = 640
+        self.h = 480
+
         self.bridge = CvBridge() # Get drone image
-        self.img_depth = np.zeros((480,640))
+        self.img_depth = np.zeros((self.h, self.w))
         self.drone_yaw = 0
         self.drone_pose = np.array([0, 0, 0])
         self.time_is_map = time.time()
 
         # get radian - To reduce calculation
-        self.w = 640
-        self.h = 480
-
         self.w_half = self.w // 2
         self.h_half = self.h // 2
 
@@ -201,7 +206,7 @@ if __name__ == "__main__" :
                 try:
                     if mp.map_np[map_x, map_y, map_z] == 0:
                         mp.map_np[map_x, map_y, map_z] = 2 # 갈 수 없음
-                        mp.map_img[16 - map_x, 51- map_y, map_z, 2] = 125 # 빨간색
+                        mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, 2] = 125 # 빨간색
                 except:
                     pass
             
@@ -213,13 +218,13 @@ if __name__ == "__main__" :
                 try:
                     if mp.map_np[map_x, map_y, map_z] == 0:
                         mp.map_np[map_x, map_y, map_z] = 1 # 갈 수 있음
-                        mp.map_img[16 - map_x, 51 - map_y, map_z, :] = 125
+                        mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, :] = 125
                         # print(map_x, map_y, map_z)
                 except:
                     pass
 
         mul = 20
-        img = cv2.resize(mp.map_img[:, :, int(mp.drone_pose[2]), :], dsize = (51 * mul, 16 * mul))
+        img = cv2.resize(mp.map_img[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul))
         cv2.imshow('Global map', img)
         key = cv2.waitKey(10)
 
