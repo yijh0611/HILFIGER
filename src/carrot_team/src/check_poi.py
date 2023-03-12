@@ -9,6 +9,7 @@ import time
 
 from cv_bridge import CvBridge # Change ros image into opencv
 from geometry_msgs.msg import PoseStamped
+from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Int32
 from std_msgs.msg import Float32MultiArray
 
@@ -18,7 +19,7 @@ class Search:
 
         rospy.init_node('search_poi', anonymous=True)
         rospy.Subscriber('/carrot_team/poi', Float32MultiArray, self.get_poi)
-        rospy.Subscriber('/red/camera/color/image_raw', Image, image_callback)
+        rospy.Subscriber('/red/camera/color/image_raw', Image, self.image_callback)
 
         self.pub_get_poi = rospy.Publisher('/carrot_team/req_poi', Int32, queue_size=10)
         # control message
@@ -88,7 +89,7 @@ class Search:
         return [qx, qy, qz, qw]
     
     def image_callback(self, msg):
-        self.img = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+        self.img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
 
 
 
@@ -122,6 +123,8 @@ if __name__ == "__main__":
 
     # imshow
     cv2.imshow('POI', ctrl.img)
+    cv2.waitKey(25)
+
     res = math.radians(45)
     for i in range(8):
         yaw = res * i
@@ -132,6 +135,7 @@ if __name__ == "__main__":
 
         # imshow
         cv2.imshow('POI', ctrl.img)
+        cv2.waitKey(25)
     
     if ctrl.poi[2] >= 2.5:
         ctrl.pose_msg.position.z = ctrl.poi[2] - 2
@@ -145,6 +149,7 @@ if __name__ == "__main__":
 
             # imshow
             cv2.imshow('POI', ctrl.img)
+            cv2.waitKey(25)
         
     if ctrl.poi[2] <= 12.5:
         ctrl.pose_msg.position.z = ctrl.poi[2] + 2
@@ -158,5 +163,6 @@ if __name__ == "__main__":
 
             # imshow
             cv2.imshow('POI', ctrl.img)
+            cv2.waitKey(25)
         
     cv2.destroyAllWindows()
