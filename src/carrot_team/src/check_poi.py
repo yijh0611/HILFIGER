@@ -31,6 +31,9 @@ class Search:
 
         # save poi
         self.poi = np.append(self.poi, tmp)
+
+        # # Print ("End message")
+        # print(self.poi)
     
     def ros_spin(self):
         rospy.spin()
