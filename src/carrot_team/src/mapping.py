@@ -19,7 +19,7 @@ from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64 # get yaw
 
 
-class mapping:
+class Mapping:
     def __init__(self):
         # Set variables
         self.x_size = 21 # 15 in introduction
@@ -150,7 +150,7 @@ class mapping:
 
 
 if __name__ == "__main__" :
-    mp = mapping()
+    mp = Mapping()
 
     while True:
         width = 640
@@ -212,7 +212,7 @@ if __name__ == "__main__" :
         if mp.is_global_mapping:
             if time.time() - mp.time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
                 # print('Global mapping')
-                
+
                 # mapping when drone is still for more than 0.5s.
                 for i in range(len(wall_x)):
                     map_x = int(mp.drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
