@@ -10,7 +10,13 @@ source devel/setup.sh
 
 chmod +x -R src/
 
+cp session_hak.yml ../startup/challenge/session_hak.yml
+cp start_hak.sh ../startup/challenge/start_hak.sh
+
+cd ../startup/challenge/
 ./start_hak.sh
+
+# ./start_hak.sh
 # cd ..
 # cd startup/challenge/
 
