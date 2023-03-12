@@ -226,23 +226,23 @@ if __name__ == "__main__" :
         if key == ord('q'):
             break
 
-        # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 2, 1, projection = '3d')
-        ax.scatter(wall_x, wall_y, wall_z, marker = '.')
-        # plt.grid(True)
-        # ax.title('3D')
+        # # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
+        # fig = plt.figure()
+        # ax = fig.add_subplot(1, 2, 1, projection = '3d')
+        # ax.scatter(wall_x, wall_y, wall_z, marker = '.')
+        # # plt.grid(True)
+        # # ax.title('3D')
 
-        # plt.subplot(2,1,2)
-        ax = fig.add_subplot(1, 2, 2)
-        ax.scatter(open_x, open_y)
-        ax.scatter(wall_x, wall_y)
-        ax.grid(True)
-        ax.scatter(0, 0)
-        # ax.title('2D')
+        # # plt.subplot(2,1,2)
+        # ax = fig.add_subplot(1, 2, 2)
+        # ax.scatter(open_x, open_y)
+        # ax.scatter(wall_x, wall_y)
+        # ax.grid(True)
+        # ax.scatter(0, 0)
+        # # ax.title('2D')
 
         print(time.time() - mp.time_total)
-        plt.show()
+        # plt.show()
         mp.time_total = time.time()
 
     cv2.destroyAllWindows()
