@@ -2,6 +2,7 @@
 
 import numpy as np
 import rospy
+import time
 import threading
 
 from icuas23_competition.msg import poi
@@ -32,6 +33,9 @@ class GetPOI:
             tmp = np.append(tmp, msg.poi[i].y)
             tmp = np.append(tmp, msg.poi[i].z)
 
+            # 두번 보내야 함
+            self.poi = np.append(self.poi, tmp)
+            time.sleep(0.1)
             self.poi = np.append(self.poi, tmp)
 
         self.poi = np.reshape(self.poi, (-1,3))
