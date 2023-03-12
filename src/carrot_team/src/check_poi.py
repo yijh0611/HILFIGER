@@ -13,7 +13,7 @@ class Search:
         self.poi = np.array([])
 
         rospy.init_node('search_poi', anonymous=True)
-        rospy.Subscriber('/carrot_team/req_poi', Float32MultiArray, self.get_poi)
+        rospy.Subscriber('/carrot_team/poi', Float32MultiArray, self.get_poi)
 
         self.pub_get_poi = rospy.Publisher('/carrot_team/req_poi', Int32, queue_size=10)
 

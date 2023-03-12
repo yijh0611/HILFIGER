@@ -35,8 +35,8 @@ class GetPOI:
 
             # 두번 보내야 함
             self.poi = np.append(self.poi, tmp)
-            time.sleep(0.1)
-            self.poi = np.append(self.poi, tmp)
+            # time.sleep(0.1)
+            # self.poi = np.append(self.poi, tmp)
 
         self.poi = np.reshape(self.poi, (-1,3))
         print(self.poi)
