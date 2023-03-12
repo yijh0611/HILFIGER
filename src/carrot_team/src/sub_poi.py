@@ -34,8 +34,8 @@ class GetPOI:
 
             self.poi = np.append(self.poi, tmp)
 
-            # Print End
-            print(self.poi)
+        self.poi = np.reshape(self.poi, (-1,3))
+        print(self.poi)
     
     def sub_poi_when_request(self, msg):
         
