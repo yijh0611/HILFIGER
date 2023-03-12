@@ -46,7 +46,7 @@ class GetPOI:
             poi_msg.data = self.poi[msg.data]
             
             # publish data
-            pub.publish(poi_msg)
+            self.pub_poi.publish(poi_msg)
     
     def ros_spin(self):
         rospy.spin()
