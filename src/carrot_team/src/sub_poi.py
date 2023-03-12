@@ -2,6 +2,7 @@
 
 import numpy as np
 import rospy
+import time
 import threading
 
 from icuas23_competition.msg import poi
@@ -19,7 +20,7 @@ class GetPOI:
         rospy.Subscriber('/carrot_team/req_poi', Int32, self.sub_poi_when_request)
         
         # poi publisher
-        pub_poi = rospy.Publisher('/carrot_team/poi', Float32MultiArray, queue_size=10)
+        self.pub_poi = rospy.Publisher('/carrot_team/poi', Float32MultiArray, queue_size=10)
 
         rospy.spin()
         # t = threading.Thread(target = self.ros_spin)
@@ -32,10 +33,13 @@ class GetPOI:
             tmp = np.append(tmp, msg.poi[i].y)
             tmp = np.append(tmp, msg.poi[i].z)
 
+            # 두번 보내야 함
             self.poi = np.append(self.poi, tmp)
+            # time.sleep(0.1)
+            # self.poi = np.append(self.poi, tmp)
 
-            # Print End
-            print(self.poi)
+        self.poi = np.reshape(self.poi, (-1,3))
+        print(self.poi)
     
     def sub_poi_when_request(self, msg):
         
@@ -46,7 +50,7 @@ class GetPOI:
             poi_msg.data = self.poi[msg.data]
             
             # publish data
-            pub.publish(poi_msg)
+            self.pub_poi.publish(poi_msg)
     
     def ros_spin(self):
         rospy.spin()
