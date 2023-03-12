@@ -138,7 +138,7 @@ if __name__ == "__main__":
         cv2.waitKey(25)
     
     if ctrl.poi[2] >= 2.5:
-        ctrl.pose_msg.position.z = ctrl.poi[2] - 2
+        ctrl.pose_msg.pose.position.z = ctrl.poi[2] - 2
 
         for i in range(8):
             yaw = res * i
@@ -152,7 +152,7 @@ if __name__ == "__main__":
             cv2.waitKey(25)
         
     if ctrl.poi[2] <= 12.5:
-        ctrl.pose_msg.position.z = ctrl.poi[2] + 2
+        ctrl.pose_msg.pose.position.z = ctrl.poi[2] + 2
 
         for i in range(8):
             yaw = res * i
