@@ -63,7 +63,7 @@ class mapping:
         # rad_w = math.atan((math.tan(rad_cam_w / 2) * n) / w_half)
         # rad_h = math.atan((math.tan(rad_cam_h / 2) * z) / h_half)
 
-        for i in range(len(self.h)):
+        for i in range(self.h):
             h = self.h_half - i
             if h <= 0:
                 h -= 1
@@ -72,7 +72,7 @@ class mapping:
 
             self.h_list = np.append(self.h_list, rad_h)
         
-        for i in range(len(self.w)):
+        for i in range(self.w):
             w = i - self.w_half
             if w >= 0:
                 w += 1
@@ -121,7 +121,7 @@ class mapping:
 
         self.drone_pose = tmp
 
-    def get_dist(self, d, w, h, w = 640, h = 480, rad_cam_w = math.radians(87), rad_cam_h = math.radians(58)): # 앞에거가 원래 58이었음.
+    def get_dist(self, d, w, h, w_all = 640, h_all = 480, rad_cam_w = math.radians(87), rad_cam_h = math.radians(58)): # 앞에거가 원래 58이었음.
 
         # w_half = w // 2
         # h_half = h // 2
@@ -131,7 +131,7 @@ class mapping:
 
         rad_w = self.w_list[w]
         rad_h = self.h_list[h]
-        
+
         dist_x = d * math.tan(rad_w)
         dist_y = d
         dist_z = d * math.tan(rad_h)
