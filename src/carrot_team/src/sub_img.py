@@ -10,7 +10,7 @@ import rospy
 from cv_bridge import CvBridge # Change ros image into opencv
 from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Float64
-from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Float64MultiArray, MultiArrayDimension
 from std_msgs.msg import String
 
 # distance publisher
@@ -78,7 +78,21 @@ def image_callback_depth(msg):
     img_data[np.isnan(img_data)] = 10.0
 
     img_array = Float64MultiArray()
-    img_array.data = img_data
+
+    dim1 = MultiArrayDimension()
+    dim1.label = "height"
+    dim1.size = img_data.shape[0]
+    dim1.stride = img_data.shape[1]
+
+    dim2 = MultiArrayDimension()
+    dim1.label = "width"
+    dim1.size = img_data.shape[1]
+    dim2.siride = 1
+
+    img_array.layout.dim.append(dim1)
+    img_array.layout.dim.append(dim2)
+
+    img_array.data = img_data.ravel().tolist()
 
     pub_distance.publish(img_array)
     

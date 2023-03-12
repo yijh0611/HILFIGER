@@ -2,6 +2,7 @@
 
 import time
 import rospy
+import math
 import numpy as np
 from geometry_msgs.msg import PoseStamped
 
@@ -50,12 +51,12 @@ while not rospy.is_shutdown():
     comm = input('Type WASD or IJKL and enter')
 
     res = 0.5 # 얼마나 이동하는지
-    res_yaw = 45
+    res_yaw = math.radians(45)
     if comm == 'l':
         # y 방향 이동
         pose_msg.pose.position.x += res  # set the y position
-        if pose_msg.pose.position.x > 14:
-            pose_msg.pose.position.x = 14
+        if pose_msg.pose.position.x > 18:
+            pose_msg.pose.position.x = 18
 
     elif comm == 'j':
         pose_msg.pose.position.x -= res
@@ -79,8 +80,8 @@ while not rospy.is_shutdown():
 
     elif comm == 's':
         pose_msg.pose.position.z -= res
-        if pose_msg.pose.position.z < 1:
-            pose_msg.pose.position.z = 1
+        if pose_msg.pose.position.z < 0.5:
+            pose_msg.pose.position.z = 0.5
         
     elif comm == 'a':
         yaw += res_yaw

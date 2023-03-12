@@ -23,7 +23,7 @@ generate_messages(
 
 catkin_package(
    INCLUDE_DIRS include
-   LIBRARIES go_to_poi
+   LIBRARIES carrot_team
    CATKIN_DEPENDS geometry_msgs roscpp rospy trajectory_msgs sensor_msgs
 #  DEPENDS system_lib
 )
@@ -37,25 +37,13 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   )
 
-add_executable(vehicle_to_poi
-        src/vehicle_to_poi.cpp
-        )
-target_link_libraries(vehicle_to_poi
-        ${catkin_LIBRARIES}
-        )
+
 add_executable(keyboard_control
         src/keyboard_control.cpp
         )
 target_link_libraries(keyboard_control
         ${catkin_LIBRARIES}
         )
-add_executable(sample
-        src/sample.cpp
-        )     
-target_link_libraries(sample
-        ${catkin_LIBRARIES}
-        )
-
 add_executable(control_main
         src/control_main.cpp
         src/modules/class.cpp
