@@ -86,6 +86,9 @@ class mapping:
             self.w_list = np.append(self.w_list, rad_w)
         
         self.time_total = time.time()
+
+        self.pos_prev = np.zeros(4)
+        self.is_global_mapping = False
         
         rospy.init_node('mapping_node', anonymous=True)
 
@@ -193,38 +196,52 @@ if __name__ == "__main__" :
                             # 1m 간격으로 Plot 하는 방법 생각해보기
 
 
-        # global mapping
-        if time.time() - mp.time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
-            print('Global mapping')
-            # mapping when drone is still for more than 0.5s.
-            for i in range(len(wall_x)):
-                map_x = int(mp.drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
-                map_y = int(mp.drone_pose[1] - wall_x[i])
-                map_z = int(mp.drone_pose[2] + wall_z[i])
-                
-                try:
-                    mp.wall_np[map_x, map_y, map_z] += 1
-                    # if mp.map_np[map_x, map_y, map_z] == 0:
-                    if mp.wall_np[map_x, map_y, map_z] >= mp.open_np[map_x, map_y, map_z]:
-                        mp.map_np[map_x, map_y, map_z] = 2 # Wall
-                        mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, 2] = 125 # 빨간색
-                except:
-                    pass
+        # Check position change
+        mp.is_global_mapping = False
+        for i in range(4):
+            if i < 3:
+                if mp.pos_prev[i] != mp.drone_pose[i]:
+                    mp.is_global_mapping = True
+                    break
             
-            for i in range(len(open_x)):
-                map_x = int(mp.drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
-                map_y = int(mp.drone_pose[1] - open_x[i])
-                map_z = int(mp.drone_pose[2] + open_z[i])
+            if i == 3:
+                if mp.pos_prev[i] != mp.drone_yaw:
+                    mp.is_global_mapping = True
 
-                try:
-                    mp.open_np[map_x, map_y, map_z] += 1
-                    # if mp.map_np[map_x, map_y, map_z] == 0:
-                    if mp.open_np[map_x, map_y, map_z] > mp.wall_np[map_x, map_y, map_z]:
-                        mp.map_np[map_x, map_y, map_z] = 1 # Open space
-                        mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, :] = 125
-                        # print(map_x, map_y, map_z)
-                except:
-                    pass
+        # global mapping
+        if mp.is_global_mapping:
+            if time.time() - mp.time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
+                # print('Global mapping')
+                
+                # mapping when drone is still for more than 0.5s.
+                for i in range(len(wall_x)):
+                    map_x = int(mp.drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
+                    map_y = int(mp.drone_pose[1] - wall_x[i])
+                    map_z = int(mp.drone_pose[2] + wall_z[i])
+                    
+                    try:
+                        mp.wall_np[map_x, map_y, map_z] += 1
+                        # if mp.map_np[map_x, map_y, map_z] == 0:
+                        if mp.wall_np[map_x, map_y, map_z] >= mp.open_np[map_x, map_y, map_z]:
+                            mp.map_np[map_x, map_y, map_z] = 2 # Wall
+                            mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, 2] = 125 # 빨간색
+                    except:
+                        pass
+                
+                for i in range(len(open_x)):
+                    map_x = int(mp.drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
+                    map_y = int(mp.drone_pose[1] - open_x[i])
+                    map_z = int(mp.drone_pose[2] + open_z[i])
+
+                    try:
+                        mp.open_np[map_x, map_y, map_z] += 1
+                        # if mp.map_np[map_x, map_y, map_z] == 0:
+                        if mp.open_np[map_x, map_y, map_z] > mp.wall_np[map_x, map_y, map_z]:
+                            mp.map_np[map_x, map_y, map_z] = 1 # Open space
+                            mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, :] = 125
+                            # print(map_x, map_y, map_z)
+                    except:
+                        pass
 
         mul = 20
         img = cv2.resize(mp.map_img[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul))
