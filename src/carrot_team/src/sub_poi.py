@@ -1,15 +1,55 @@
 #!/usr/bin/env python
+
+import numpy as np
 import rospy
+import threading
+
 from icuas23_competition.msg import poi
+from std_msgs.msg import Int32
+from std_msgs.msg import MultiArrayFloat32
 
-def get_poi(msg):
-    print(msg)
+class GetPOI:
+    def __init__(self):
+        # save poi
+        self.poi = np.array([])
 
-print(1)
-rospy.init_node('sub_poi', anonymous=True)
-rospy.Subscriber('/red/poi', poi, get_poi)
+        # ros subscriber
+        rospy.init_node('sub_poi', anonymous=True)
+        rospy.Subscriber('/red/poi', poi, self.get_poi)
+        rospy.Subscriber('/carrot_team/req_poi', Int32, self.sub_poi_when_request)
+        
+        # poi publisher
+        pub_poi = rospy.Publisher('/carrot_team/poi', MultiArrayFloat32, queue_size=10)
 
-rospy.spin()
+        rospy.spin()
+        # t = threading.Thread(target = self.ros_spin)
+        # t.start
+
+    def get_poi(self, msg):
+        for i in range(len(msg.poi)):
+            tmp = np.array([])
+            tmp = np.append(tmp, msg.poi[i].x)
+            tmp = np.append(tmp, msg.poi[i].y)
+            tmp = np.append(tmp, msg.poi[i].z)
+
+            self.poi = np.append(self.poi, tmp)
+    
+    def sub_poi_when_request(self, msg):
+        
+
+        if msg < len(self.poi):
+            # data to publish
+            poi_msg = MultiArrayFloat32()
+            poi_msg.data = self.poi[msg]
+            
+            # publish data
+            pub.publish(poi_msg)
+    
+    def ros_spin(self):
+        rospy.spin()
+
+if __name__ == "__main__":
+    poi = GetPOI()
 
 # <<<<<<< hak
 
@@ -35,7 +75,10 @@ rospy.spin()
 
 
 
-# tile_poses = [(7.56, 8.32, 9.1, 0.7854), (7.57, 14.60, 5.5, -0.7854), (3.00, 43.36, 11.1, -1.5707), (9.3, 43.36, 4.8, -1.5707), (10.36, 45.3, 3.8, 0), (10.36, 46.2, 12.1, 0), (10.36, 44.5, 8.35, 0), (16.2, 44.275, 7.3, -1.5707), (5.92, 12, 4.35, 3.1415), (6.34, 11, 4.35, 0)]
+# tile_poses = [(7.56, 8.32, 9.1, 0.7854), (7.57, 14.60, 5.5, -0.7854), (3.00, 43.36, 11.1, -1.5707), 
+# (9.3, 43.36, 4.8, -1.5707), (10.36, 45.3, 3.8, 0), (10.36, 46.2, 12.1, 0), 
+# (10.36, 44.5, 8.35, 0), (16.2, 44.275, 7.3, -1.5707), (5.92, 12, 4.35, 3.1415),
+# (6.34, 11, 4.35, 0)]
 
 # rospy.init_node('spawner_deleter')
 # # delete_model = rospy.ServiceProxy("/gazebo/delete_model", DeleteModel)
