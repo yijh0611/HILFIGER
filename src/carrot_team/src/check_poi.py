@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
+import cv2
+import math
 import numpy as np
 import rospy
 import threading
 import time
 
+from cv_bridge import CvBridge # Change ros image into opencv
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Int32
 from std_msgs.msg import Float32MultiArray
@@ -15,6 +18,7 @@ class Search:
 
         rospy.init_node('search_poi', anonymous=True)
         rospy.Subscriber('/carrot_team/poi', Float32MultiArray, self.get_poi)
+        rospy.Subscriber('/red/camera/color/image_raw', Image, image_callback)
 
         self.pub_get_poi = rospy.Publisher('/carrot_team/req_poi', Int32, queue_size=10)
         # control message
@@ -33,6 +37,9 @@ class Search:
         self.pose_msg.pose.orientation.w = 1.0  # set the w orientation
 
         self.yaw = 0
+
+        # image
+        self.bridge = CvBridge() # Get drone image
 
         t = threading.Thread(target = self.ros_spin)
         t.start
@@ -80,6 +87,11 @@ class Search:
 
         return [qx, qy, qz, qw]
     
+    def image_callback(self, msg):
+        self.img = bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+
+
+
 if __name__ == "__main__":
     # call class
     ctrl = Search()
@@ -105,4 +117,46 @@ if __name__ == "__main__":
     ctrl.pose_msg.pose.position.z = ctrl.poi[2]
     
     ctrl.pose_publisher.publish(ctrl.pose_msg)
-      
+
+    time.sleep(3)
+
+    # imshow
+    cv2.imshow('POI', ctrl.img)
+    res = math.radians(45)
+    for i in range(8):
+        yaw = res * i
+        ctrl.get_quaternion_from_euler(0, 0, yaw)
+
+        ctrl.pose_publisher.publish(ctrl.pose_msg)
+        time.sleep(3)
+
+        # imshow
+        cv2.imshow('POI', ctrl.img)
+    
+    if ctrl.poi[2] >= 2.5:
+        ctrl.pose_msg.position.z = ctrl.poi[2] - 2
+
+        for i in range(8):
+            yaw = res * i
+            ctrl.get_quaternion_from_euler(0, 0, yaw)
+
+            ctrl.pose_publisher.publish(ctrl.pose_msg)
+            time.sleep(3)
+
+            # imshow
+            cv2.imshow('POI', ctrl.img)
+        
+    if ctrl.poi[2] <= 12.5:
+        ctrl.pose_msg.position.z = ctrl.poi[2] + 2
+
+        for i in range(8):
+            yaw = res * i
+            ctrl.get_quaternion_from_euler(0, 0, yaw)
+
+            ctrl.pose_publisher.publish(ctrl.pose_msg)
+            time.sleep(3)
+
+            # imshow
+            cv2.imshow('POI', ctrl.img)
+        
+    cv2.destroyAllWindows()
