@@ -9,11 +9,11 @@ print(1)
 rospy.init_node('sub_poi', anonymous=True)
 rospy.Subscriber('/red/poi', poi, get_poi)
 
-# <<<<<<< hak
 rospy.spin()
 
+# <<<<<<< hak
 
-# # 원래 코드
+# # # 원래 코드
 # import random
 # import subprocess
 # from gazebo_msgs.srv import DeleteModel, DeleteModelRequest
