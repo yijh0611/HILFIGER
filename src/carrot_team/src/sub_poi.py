@@ -42,7 +42,7 @@ class GetPOI:
 
         if msg.data < len(self.poi):
             # data to publish
-            poi_msg = MultiArrayFloat32()
+            poi_msg = Float32MultiArray()
             poi_msg.data = self.poi[msg.data]
             
             # publish data
