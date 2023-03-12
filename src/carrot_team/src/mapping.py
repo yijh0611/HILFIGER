@@ -159,32 +159,33 @@ if __name__ == "__main__" :
         # Rotation matrix
         rot = np.array([[math.cos(mp.drone_yaw), -1 * math.sin(mp.drone_yaw)],[math.sin(mp.drone_yaw), math.cos(mp.drone_yaw)]])
         
-        for i in range(60,420):
-            for j in range(64, 576):
-                
-                d = mp.img_depth[i][j]
-                isNaN = np.isnan(d)
-                if isNaN:
-                    # print('isNaN')
-                    d = 10
-                dist_x, dist_y, dist_z = mp.get_dist(d, j, i) # w, h
-
-                dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
-
-                if d != 10:
-                    wall_x = np.append(wall_x, dist_x_rot)
-                    wall_y = np.append(wall_y, dist_y_rot)
-                    wall_z = np.append(wall_z, dist_z)
-
-                # Open space mapping
-                if i % 5 == 0:
+        for i in range(80,420): # 60 ~ 420
+            if i % 5 == 0:
+                for j in range(64, 576):
                     if j % 5 == 0:
-                        n = 5 # Resolution (How many)
-                        for k in range(1,n + 1):
-                            open_x = np.append(open_x, dist_x_rot * k / n)
-                            open_y = np.append(open_y, dist_y_rot * k / n)
-                            open_z = np.append(open_z, dist_z * k / n)
-                            # 1m 간격으로 Plot 하는 방법 생각해보기
+                        d = mp.img_depth[i][j]
+                        isNaN = np.isnan(d)
+                        if isNaN:
+                            # print('isNaN')
+                            d = 10
+                        dist_x, dist_y, dist_z = mp.get_dist(d, j, i) # w, h
+
+                        dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
+
+                        if d != 10:
+                            wall_x = np.append(wall_x, dist_x_rot)
+                            wall_y = np.append(wall_y, dist_y_rot)
+                            wall_z = np.append(wall_z, dist_z)
+
+                        # Open space mapping
+                        if i % 5 == 0:
+                            if j % 5 == 0:
+                                n = 5 # Resolution (How many)
+                                for k in range(1,n + 1):
+                                    open_x = np.append(open_x, dist_x_rot * k / n)
+                                    open_y = np.append(open_y, dist_y_rot * k / n)
+                                    open_z = np.append(open_z, dist_z * k / n)
+                                    # 1m 간격으로 Plot 하는 방법 생각해보기
 
 
         # global mapping # 3D 형태로 수정 필요
@@ -213,7 +214,7 @@ if __name__ == "__main__" :
                     if mp.map_np[map_x, map_y, map_z] == 0:
                         mp.map_np[map_x, map_y, map_z] = 1 # 갈 수 있음
                         mp.map_img[16 - map_x, 51 - map_y, map_z, :] = 125
-                        print(map_x, map_y, map_z)
+                        # print(map_x, map_y, map_z)
                 except:
                     pass
 
@@ -243,5 +244,5 @@ if __name__ == "__main__" :
         print(time.time() - mp.time_total)
         plt.show()
         mp.time_total = time.time()
-        
+
     cv2.destroyAllWindows()
