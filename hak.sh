@@ -10,7 +10,8 @@ source devel/setup.sh
 
 chmod +x -R src/
 
-cd ..
-cd startup/challenge/
+./start_hak.sh
+# cd ..
+# cd startup/challenge/
 
-echo 'End'
+# echo 'End'
