@@ -206,11 +206,13 @@ if __name__ == "__main__" :
             for i in range(len(open_x)):
                 map_x = int(mp.drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
                 map_y = int(mp.drone_pose[1] - open_x[i])
+                map_z = int(mp.drone_pose[2] + open_z[i])
 
                 try:
                     if mp.map_np[map_x, map_y, map_z] == 0:
                         mp.map_np[map_x, map_y, map_z] = 1 # 갈 수 있음
                         mp.map_img[16 - map_x, 51 - map_y, map_z, :] = 125
+                        print(map_x, map_y, map_z)
                 except:
                     pass
 
