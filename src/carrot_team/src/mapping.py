@@ -31,7 +31,11 @@ class mapping:
         # 0 : Unknown, 1 : Open, 2 : Wall
         # Color :
         # Black : Unknown, White : Open, Red : Wall
-                
+
+        # Check how many times detectes as wall or open space
+        self.wall_np = np.zeros((self.x_size, self.y_size, self.z_size))
+        self.open_np = np.zeros((self.x_size, self.y_size, self.z_size))
+
         # Shape of map (Resolution 1m)
         '''
         15*50*25
@@ -43,9 +47,7 @@ class mapping:
 
         맵의 크기는 0도 포함해서 16 * 51 * 26으로
         현재는 2D 이기 때문에 16 * 51으로 만들 계획이다.
-
         '''
-
         self.w = 640
         self.h = 480
 
@@ -164,10 +166,10 @@ if __name__ == "__main__" :
         # Rotation matrix
         rot = np.array([[math.cos(mp.drone_yaw), -1 * math.sin(mp.drone_yaw)],[math.sin(mp.drone_yaw), math.cos(mp.drone_yaw)]])
         
-        for i in range(80,420): # 60 ~ 420
-            if i % 5 == 0:
-                for j in range(64, 576):
-                    if j % 5 == 0:
+        for i in range(80, 420, 5): # 60 ~ 420
+            # if i % 5 == 0:
+                for j in range(64, 576, 5):
+                    # if j % 5 == 0:
                         d = mp.img_depth[i][j]
                         isNaN = np.isnan(d)
                         if isNaN:
@@ -183,29 +185,28 @@ if __name__ == "__main__" :
                             wall_z = np.append(wall_z, dist_z)
 
                         # Open space mapping
-                        if i % 5 == 0:
-                            if j % 5 == 0:
-                                n = 5 # Resolution (How many)
-                                for k in range(1,n + 1):
-                                    open_x = np.append(open_x, dist_x_rot * k / n)
-                                    open_y = np.append(open_y, dist_y_rot * k / n)
-                                    open_z = np.append(open_z, dist_z * k / n)
-                                    # 1m 간격으로 Plot 하는 방법 생각해보기
+                        n = 5 # Resolution (How many)
+                        for k in range(1,n + 1):
+                            open_x = np.append(open_x, dist_x_rot * k / n)
+                            open_y = np.append(open_y, dist_y_rot * k / n)
+                            open_z = np.append(open_z, dist_z * k / n)
+                            # 1m 간격으로 Plot 하는 방법 생각해보기
 
 
-        # global mapping # 3D 형태로 수정 필요
+        # global mapping
         if time.time() - mp.time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
             print('Global mapping')
-            # 0.5초 이상 yaw의 변화가 없었을 때 매핑을 한다.
-            # 지금은 매핑 되어있지 않은 곳에만 매핑을 한다.
+            # mapping when drone is still for more than 0.5s.
             for i in range(len(wall_x)):
                 map_x = int(mp.drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
                 map_y = int(mp.drone_pose[1] - wall_x[i])
                 map_z = int(mp.drone_pose[2] + wall_z[i])
                 
                 try:
-                    if mp.map_np[map_x, map_y, map_z] == 0:
-                        mp.map_np[map_x, map_y, map_z] = 2 # 갈 수 없음
+                    mp.wall_np[map_x, map_y, map_z] += 1
+                    # if mp.map_np[map_x, map_y, map_z] == 0:
+                    if mp.wall_np[map_x, map_y, map_z] >= np.open_np[map_x, map_y, map_z]:
+                        mp.map_np[map_x, map_y, map_z] = 2 # Wall
                         mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, 2] = 125 # 빨간색
                 except:
                     pass
@@ -216,8 +217,10 @@ if __name__ == "__main__" :
                 map_z = int(mp.drone_pose[2] + open_z[i])
 
                 try:
-                    if mp.map_np[map_x, map_y, map_z] == 0:
-                        mp.map_np[map_x, map_y, map_z] = 1 # 갈 수 있음
+                    mp.open_np[map_x, map_y, map_z] += 1
+                    # if mp.map_np[map_x, map_y, map_z] == 0:
+                    if mp.open_np[map_x, map_y, map_z] > np.wall_np[map_x, map_y, map_z]:
+                        mp.map_np[map_x, map_y, map_z] = 1 # Open space
                         mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, :] = 125
                         # print(map_x, map_y, map_z)
                 except:
