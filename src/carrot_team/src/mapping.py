@@ -208,8 +208,8 @@ if __name__ == "__main__" :
                 map_y = int(mp.drone_pose[1] - open_x[i])
 
                 try:
-                    if mp.map_np[map_x, map_y] == 0:
-                        mp.map_np[map_x, map_y] = 1 # 갈 수 있음
+                    if mp.map_np[map_x, map_y, map_z] == 0:
+                        mp.map_np[map_x, map_y, map_z] = 1 # 갈 수 있음
                         mp.map_img[16 - map_x, 51 - map_y, map_z, :] = 125
                 except:
                     pass
