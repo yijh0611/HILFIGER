@@ -205,7 +205,7 @@ if __name__ == "__main__" :
                 try:
                     mp.wall_np[map_x, map_y, map_z] += 1
                     # if mp.map_np[map_x, map_y, map_z] == 0:
-                    if mp.wall_np[map_x, map_y, map_z] >= np.open_np[map_x, map_y, map_z]:
+                    if mp.wall_np[map_x, map_y, map_z] >= mp.open_np[map_x, map_y, map_z]:
                         mp.map_np[map_x, map_y, map_z] = 2 # Wall
                         mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, 2] = 125 # 빨간색
                 except:
@@ -219,7 +219,7 @@ if __name__ == "__main__" :
                 try:
                     mp.open_np[map_x, map_y, map_z] += 1
                     # if mp.map_np[map_x, map_y, map_z] == 0:
-                    if mp.open_np[map_x, map_y, map_z] > np.wall_np[map_x, map_y, map_z]:
+                    if mp.open_np[map_x, map_y, map_z] > mp.wall_np[map_x, map_y, map_z]:
                         mp.map_np[map_x, map_y, map_z] = 1 # Open space
                         mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, :] = 125
                         # print(map_x, map_y, map_z)
