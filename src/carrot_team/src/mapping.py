@@ -60,9 +60,6 @@ class mapping:
         self.w_list = np.array([])
         self.h_list = np.array([])
 
-        # rad_w = math.atan((math.tan(rad_cam_w / 2) * n) / w_half)
-        # rad_h = math.atan((math.tan(rad_cam_h / 2) * z) / h_half)
-
         for i in range(self.h):
             h = self.h_half - i
             if h <= 0:
@@ -122,13 +119,6 @@ class mapping:
         self.drone_pose = tmp
 
     def get_dist(self, d, w, h, w_all = 640, h_all = 480, rad_cam_w = math.radians(87), rad_cam_h = math.radians(58)): # 앞에거가 원래 58이었음.
-
-        # w_half = w // 2
-        # h_half = h // 2
-
-        # rad_w = math.atan((math.tan(rad_cam_w / 2) * n) / w_half)
-        # rad_h = math.atan((math.tan(rad_cam_h / 2) * z) / h_half)
-
         rad_w = self.w_list[w]
         rad_h = self.h_list[h]
 
@@ -169,22 +159,13 @@ if __name__ == "__main__" :
         rot = np.array([[math.cos(mp.drone_yaw), -1 * math.sin(mp.drone_yaw)],[math.sin(mp.drone_yaw), math.cos(mp.drone_yaw)]])
         
         for i in range(60,420):
-        # for i in range(200, 300):
             for j in range(64, 576):
-                # h = h_half - i
-                # if h <= 0:
-                #     h -= 1
-                # w = j - w_half
-                # if w >= 0:
-                #     w += 1
                 
                 d = mp.img_depth[i][j]
                 isNaN = np.isnan(d)
                 if isNaN:
-                    print('isNaN')
+                    # print('isNaN')
                     d = 10
-
-                # dist_x, dist_y, dist_z = get_dist(img_depth[i][j], w, h)
                 dist_x, dist_y, dist_z = mp.get_dist(d, j, i) # w, h
 
                 dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
@@ -241,14 +222,6 @@ if __name__ == "__main__" :
             break
 
         # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
-
-        # plt.subplot(2,1,1)
-        # plt.plot(wall_x, wall_y)
-        # plt.grid(True)
-        # plt.title('Converted_line')
-
-
-        # plt.subplot(2,1,1)
 
         fig = plt.figure()
         ax = fig.add_subplot(1, 2, 1, projection = '3d')
