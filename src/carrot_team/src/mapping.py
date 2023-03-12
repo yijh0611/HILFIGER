@@ -176,13 +176,13 @@ if __name__ == "__main__" :
                     wall_z = np.append(wall_z, dist_z)
 
                 # Open space mapping
-                if i == 240:
-                    n = 5 # Resolution (How many)
-                    for k in range(1,n + 1):
-                        open_x = np.append(open_x, dist_x_rot * k / n)
-                        open_y = np.append(open_y, dist_y_rot * k / n)
-                        open_z = np.append(open_z, dist_z * k / n)
-                        # 1m 간격으로 Plot 하는 방법 생각해보기
+                # if i == 240:
+                n = 5 # Resolution (How many)
+                for k in range(1,n + 1):
+                    open_x = np.append(open_x, dist_x_rot * k / n)
+                    open_y = np.append(open_y, dist_y_rot * k / n)
+                    open_z = np.append(open_z, dist_z * k / n)
+                    # 1m 간격으로 Plot 하는 방법 생각해보기
 
 
         # global mapping # 3D 형태로 수정 필요
@@ -222,7 +222,6 @@ if __name__ == "__main__" :
             break
 
         # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
-
         fig = plt.figure()
         ax = fig.add_subplot(1, 2, 1, projection = '3d')
         ax.scatter(wall_x, wall_y, wall_z, marker = '.')
