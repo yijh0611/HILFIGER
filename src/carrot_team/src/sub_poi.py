@@ -20,9 +20,9 @@ class GetPOI:
         # poi publisher
         pub_poi = rospy.Publisher('/carrot_team/poi', MultiArrayFloat32, queue_size=10)
 
-        # rospy.spin()
-        t = threading.Thread(target = self.ros_spin)
-        t.start
+        rospy.spin()
+        # t = threading.Thread(target = self.ros_spin)
+        # t.start
 
     def get_poi(self, msg):
         for i in range(len(msg.poi)):
