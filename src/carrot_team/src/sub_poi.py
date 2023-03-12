@@ -6,7 +6,7 @@ import threading
 
 from icuas23_competition.msg import poi
 from std_msgs.msg import Int32
-from std_msgs.msg import MultiArrayFloat32
+from std_msgs.msg import Float32MultiArray
 
 class GetPOI:
     def __init__(self):
@@ -19,7 +19,7 @@ class GetPOI:
         rospy.Subscriber('/carrot_team/req_poi', Int32, self.sub_poi_when_request)
         
         # poi publisher
-        pub_poi = rospy.Publisher('/carrot_team/poi', MultiArrayFloat32, queue_size=10)
+        pub_poi = rospy.Publisher('/carrot_team/poi', Float32MultiArray, queue_size=10)
 
         rospy.spin()
         # t = threading.Thread(target = self.ros_spin)
