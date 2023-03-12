@@ -47,6 +47,41 @@ class mapping:
         self.drone_pose = np.array([0, 0, 0])
         self.time_is_map = time.time()
 
+        # get radian - To reduce calculation
+        self.w = 640
+        self.h = 480
+
+        self.w_half = self.w // 2
+        self.h_half = self.h // 2
+
+        self.w_rad = math.radians(87)
+        self.h_rad = math.radians(58)
+
+        self.w_list = np.array([])
+        self.h_list = np.array([])
+
+        # rad_w = math.atan((math.tan(rad_cam_w / 2) * n) / w_half)
+        # rad_h = math.atan((math.tan(rad_cam_h / 2) * z) / h_half)
+
+        for i in range(len(self.h)):
+            h = self.h_half - i
+            if h <= 0:
+                h -= 1
+            
+            rad_h = math.atan((math.tan(self.h_rad / 2) * h) / self.h_half)
+
+            self.h_list = np.append(self.h_list, rad_h)
+        
+        for i in range(len(self.w)):
+            w = i - self.w_half
+            if w >= 0:
+                w += 1
+            
+            rad_w = math.atan((math.tan(self.w_rad / 2) * w) / self.w_half)
+
+            self.w_list = np.append(self.w_list, rad_w)
+        
+        
         rospy.init_node('mapping_node', anonymous=True)
 
         rospy.Subscriber('/red/camera/depth/image_raw', Image, self.image_callback_depth)
@@ -86,14 +121,17 @@ class mapping:
 
         self.drone_pose = tmp
 
-    def get_dist(self, d, n, z, w = 640, h = 480, rad_cam_w = math.radians(87), rad_cam_h = math.radians(58)): # 앞에거가 원래 58이었음.
+    def get_dist(self, d, w, h, w = 640, h = 480, rad_cam_w = math.radians(87), rad_cam_h = math.radians(58)): # 앞에거가 원래 58이었음.
 
-        w_half = w // 2
-        h_half = h // 2
+        # w_half = w // 2
+        # h_half = h // 2
 
-        rad_w = math.atan((math.tan(rad_cam_w / 2) * n) / w_half)
-        rad_h = math.atan((math.tan(rad_cam_h / 2) * z) / h_half)
+        # rad_w = math.atan((math.tan(rad_cam_w / 2) * n) / w_half)
+        # rad_h = math.atan((math.tan(rad_cam_h / 2) * z) / h_half)
 
+        rad_w = self.w_list[w]
+        rad_h = self.h_list[h]
+        
         dist_x = d * math.tan(rad_w)
         dist_y = d
         dist_z = d * math.tan(rad_h)
@@ -130,23 +168,24 @@ if __name__ == "__main__" :
         # Rotation matrix
         rot = np.array([[math.cos(mp.drone_yaw), -1 * math.sin(mp.drone_yaw)],[math.sin(mp.drone_yaw), math.cos(mp.drone_yaw)]])
         
-        # for i in range(60,420):
-        for i in range(200, 300):
+        for i in range(60,420):
+        # for i in range(200, 300):
             for j in range(64, 576):
-                h = h_half - i
-                if h <= 0:
-                    h -= 1
-                w = j - w_half
-                if w >= 0:
-                    w += 1
+                # h = h_half - i
+                # if h <= 0:
+                #     h -= 1
+                # w = j - w_half
+                # if w >= 0:
+                #     w += 1
                 
                 d = mp.img_depth[i][j]
                 isNaN = np.isnan(d)
                 if isNaN:
+                    print('isNaN')
                     d = 10
 
                 # dist_x, dist_y, dist_z = get_dist(img_depth[i][j], w, h)
-                dist_x, dist_y, dist_z = mp.get_dist(d, w, h)
+                dist_x, dist_y, dist_z = mp.get_dist(d, j, i) # w, h
 
                 dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
 
@@ -176,7 +215,7 @@ if __name__ == "__main__" :
                 map_z = int(mp.drone_pose[2] + wall_z[i])
                 
                 try:
-                    if map_np[map_x, map_y, map_z] == 0:
+                    if mp.map_np[map_x, map_y, map_z] == 0:
                         mp.map_np[map_x, map_y, map_z] = 2 # 갈 수 없음
                         mp.map_img[16 - map_x, 51- map_y, map_z, 2] = 125 # 빨간색
                 except:
@@ -187,7 +226,7 @@ if __name__ == "__main__" :
                 map_y = int(mp.drone_pose[1] - open_x[i])
 
                 try:
-                    if map_np[map_x, map_y] == 0:
+                    if mp.map_np[map_x, map_y] == 0:
                         mp.map_np[map_x, map_y] = 1 # 갈 수 있음
                         mp.map_img[16 - map_x, 51 - map_y, map_z, :] = 125
                 except:
