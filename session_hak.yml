@@ -46,7 +46,7 @@ windows:
   - solution:
       layout: tiled
       panes:
-        - source ../../HILFIGER/devel/setup.sh; waitForRos; rosrun carrot_team sub_poi.py
         - source ../../HILFIGER/devel/setup.sh; waitForRos; rosrun carrot_team check_poi.py
+        - source ../../HILFIGER/devel/setup.sh; waitForRos; rosrun carrot_team sub_poi.py
         - source ../../HILFIGER/devel/setup.sh
         - source ../../HILFIGER/devel.setup.sh
