@@ -210,9 +210,7 @@ if __name__ == "__main__" :
 
         # global mapping
         if mp.is_global_mapping:
-            if time.time() - mp.time_is_map > 0.5 and (len(wall_x) > 0 or len(open_x) > 0):
-                # print('Global mapping')
-
+            if time.time() - mp.time_is_map > 0.2 and (len(wall_x) > 0 or len(open_x) > 0):
                 # mapping when drone is still for more than 0.5s.
                 for i in range(len(wall_x)):
                     map_x = int(mp.drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
@@ -222,7 +220,7 @@ if __name__ == "__main__" :
                     try:
                         mp.wall_np[map_x, map_y, map_z] += 1
                         # if mp.map_np[map_x, map_y, map_z] == 0:
-                        if mp.wall_np[map_x, map_y, map_z] >= mp.open_np[map_x, map_y, map_z]:
+                        if mp.wall_np[map_x, map_y, map_z] * 10 >= mp.open_np[map_x, map_y, map_z]:
                             mp.map_np[map_x, map_y, map_z] = 2 # Wall
                             mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, 2] = 125 # 빨간색
                     except:
@@ -236,7 +234,7 @@ if __name__ == "__main__" :
                     try:
                         mp.open_np[map_x, map_y, map_z] += 1
                         # if mp.map_np[map_x, map_y, map_z] == 0:
-                        if mp.open_np[map_x, map_y, map_z] > mp.wall_np[map_x, map_y, map_z]:
+                        if mp.open_np[map_x, map_y, map_z] > mp.wall_np[map_x, map_y, map_z] * 10:
                             mp.map_np[map_x, map_y, map_z] = 1 # Open space
                             mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, :] = 125
                             # print(map_x, map_y, map_z)
@@ -252,22 +250,58 @@ if __name__ == "__main__" :
             break
 
         # # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
-        # fig = plt.figure()
-        # ax = fig.add_subplot(1, 2, 1, projection = '3d')
-        # ax.scatter(wall_x, wall_y, wall_z, marker = '.')
-        # # plt.grid(True)
-        # # ax.title('3D')
+        if len(wall_x) > 0:
+            print(len(wall_x))
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 2, 1, projection = '3d')
+            ax.scatter(wall_x, wall_y, wall_z, marker = '.')
+            # plt.grid(True)
+            # ax.title('3D')
 
-        # # plt.subplot(2,1,2)
-        # ax = fig.add_subplot(1, 2, 2)
-        # ax.scatter(open_x, open_y)
-        # ax.scatter(wall_x, wall_y)
-        # ax.grid(True)
-        # ax.scatter(0, 0)
-        # # ax.title('2D')
+            # plt.subplot(2,1,2)
+            # new map temp
+            # h_tmp = int(mp.drone_pose[2])
+            wall_x_tmp = np.array([])
+            wall_y_tmp = np.array([])
+            # print('wall_z :', len(wall_z))
+            for i,n in enumerate(wall_z):
+                if int(n) == 0:
+                    wall_x_tmp = np.append(wall_x_tmp, wall_x[i])
+                    wall_y_tmp = np.append(wall_y_tmp, wall_y[i])
+                
+            ax = fig.add_subplot(1, 2, 2)
+            ax.scatter(open_x, open_y)
+            ax.scatter(wall_x_tmp, wall_y_tmp)
+            # ax.scatter(wall_x, wall_y)
+            ax.grid(True)
+            ax.scatter(0, 0)
+            # ax.title('2D')
+            
+            # # plt.show()
 
-        # print(time.time() - mp.time_total)
-        # plt.show()
+            # # 안됨
+            # fig = plt.gcf()
+            # fig.canvas.draw()
+            # image = np.array(fig.canvas.renderer.buffer_rgba())
+            # print(image.size)
+            # print(image)
+            # print(np.shape(image))
+
+            # # Convert RGBA to BGR format
+            # height, width, channels = image.shape
+            # image = cv2.UMat(np.zeros((height, width, 3), dtype=np.uint8))
+            # cv2.cvtColor(image, cv2.COLOR_RGBA2BGR, 3, image)
+
+            # 이미지 저장 후 다시 불러와서 imshow
+            filename = 'plot.png'
+            fig.savefig(filename)
+
+            img = cv2.imread(filename)
+
+            cv2.imshow("Local mapping", img)
+            key = cv2.waitKey(10)
+
+        print(time.time() - mp.time_total)
         mp.time_total = time.time()
 
     cv2.destroyAllWindows()
