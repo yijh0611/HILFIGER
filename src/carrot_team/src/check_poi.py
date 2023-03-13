@@ -41,6 +41,10 @@ class Search:
 
         # image
         self.bridge = CvBridge() # Get drone image
+        self.src = '/root/pic'
+        if not os.path.isdir(self.src):
+            os.mkdir(self.src)
+        self.count = 0
 
         t = threading.Thread(target = self.ros_spin)
         t.start
@@ -123,6 +127,8 @@ if __name__ == "__main__":
 
     # imshow
     cv2.imshow('POI', ctrl.img)
+    cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', img)
+    ctrl.count += 1
     cv2.waitKey(25)
 
     res = math.radians(45)
@@ -135,6 +141,8 @@ if __name__ == "__main__":
 
         # imshow
         cv2.imshow('POI', ctrl.img)
+        cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', img)
+        ctrl.count += 1
         cv2.waitKey(25)
     
     if ctrl.poi[2] >= 2.5:
@@ -149,6 +157,8 @@ if __name__ == "__main__":
 
             # imshow
             cv2.imshow('POI', ctrl.img)
+            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', img)
+            ctrl.count += 1
             cv2.waitKey(25)
         
     if ctrl.poi[2] <= 12.5:
@@ -163,6 +173,8 @@ if __name__ == "__main__":
 
             # imshow
             cv2.imshow('POI', ctrl.img)
+            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', img)
+            ctrl.count += 1
             cv2.waitKey(25)
         
     cv2.destroyAllWindows()
