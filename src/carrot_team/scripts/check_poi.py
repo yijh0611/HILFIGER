@@ -44,6 +44,10 @@ class Search:
 
         # is poi ready
         self.is_poi = False
+        self.is_get_poi_end = False
+
+        # number of poi
+        self.no_poi = 10
 
         # image
         self.bridge = CvBridge() # Get drone image
@@ -57,18 +61,50 @@ class Search:
 
     
     def get_poi(self, msg):
+        
+        tmp = np.reshape(msg.data, (-1, 3))
+        self.poi = tmp
+        
+        
+        print(self.poi)
+        print()
+        print(np.shape(self.poi))
 
-        # get poi
-        tmp = np.array([])
-        tmp = np.append(tmp, msg.data[0])
-        tmp = np.append(tmp, msg.data[1])
-        tmp = np.append(tmp, msg.data[2])
+        if len(self.poi) > 9:
+            self.is_get_poi_end = True
+       
+        # # get poi
+        # tmp = np.array([])
+        # tmp = np.append(tmp, msg.data[0])
+        # tmp = np.append(tmp, msg.data[1])
+        # tmp = np.append(tmp, msg.data[2])
 
-        # save poi
-        self.poi = np.append(self.poi, tmp)
-
-        # # Print ("End message")
+        # # save poi
+        # if tmp in self.poi:
+        #     # pass
+        #     print('tmp in self.poi !')
+        #     print(tmp)
+        # else:
+        #     self.poi = np.append(self.poi, tmp)
+        #     self.poi = np.reshape(self.poi, (-1,3))
+        
+        # print(np.shape(self.poi))
         # print(self.poi)
+
+        # if len(self.poi) < self.no_poi:
+        #     print('Request again')
+        #     get_poi = Int32()
+
+        #     tmp = self.no_poi + 1
+        #     get_poi.data = int(tmp)
+
+        #     self.pub_get_poi.publish(get_poi)
+        # else:
+        #     self.is_get_poi_end = True
+        #     print('Get poi end')
+
+        # # # Print ("End message")
+        # # print(self.poi)
     
     def ros_spin(self):
         rospy.spin()
@@ -108,42 +144,59 @@ if __name__ == "__main__":
     # call class
     ctrl = Search()
 
+    wait_time = 5
+
     time_start = time.time()
     # Wait until poi is recieved
     while ctrl.is_poi == False:
         time.sleep(0.1)
-        if time.time() - time_start > 10:
-            # When 10s is passed
-            exit()
+        if time.time() - time_start > 40:
+            # When 40s is passed
+            exit() # 이 기능은 최종적으로는 빼는게 좋을 듯 하다.
 
     # request poi
     get_poi = Int32()
-    tmp = int(input('Type which poi'))
-    if tmp > 9:
-        tmp = 9
-    elif tmp < 0:
-        tmp = 0
+    # tmp = int(input('Type which poi'))
+    # if tmp > 9:
+    #     tmp = 9
+    # elif tmp < 0:
+    #     tmp = 0
+    tmp = ctrl.no_poi + 1
     get_poi.data = int(tmp)
 
-    for i in range(1):
-        # 오래동안 publish 안했으면 처음거는 버려지기 때문에 2개를 Publish 해야 정보를 받을 수 있다.
-        ctrl.pub_get_poi.publish(get_poi)
-        time.sleep(0.1)
+    # for i in range(1):
+    # 오래동안 publish 안했으면 처음거는 버려지기 때문에 2개를 Publish 해야 정보를 받을 수 있다.
+    ctrl.pub_get_poi.publish(get_poi)
+    # time.sleep(0.1)
 
-    # wait 10s
-    time.sleep(3)
+    # # wait 10s
+    # time.sleep(10)
+    
+    # wait until getting poi ends
+    while ctrl.is_get_poi_end == False:
+        time.sleep(1)
+        print('Waiting')
 
-    print(np.shape(ctrl.poi))
-    print(ctrl.poi)
+    # print(np.shape(ctrl.poi))
+    # print(ctrl.poi)
+
+    for i in range(len(ctrl.poi)):
+        if ctrl.poi[i][1] == 11.0:
+            first_idx = i # ctrl.poi[i]
+            print(ctrl.poi[first_idx])
+            break
 
     print('Move to POI')
-    ctrl.pose_msg.pose.position.x = ctrl.poi[0]
-    ctrl.pose_msg.pose.position.y = ctrl.poi[1]
-    ctrl.pose_msg.pose.position.z = ctrl.poi[2]
+    ctrl.pose_msg.pose.position.x = ctrl.poi[first_idx][0]
+    ctrl.pose_msg.pose.position.y = ctrl.poi[first_idx][1]
+    ctrl.pose_msg.pose.position.z = ctrl.poi[first_idx][2]
+    # ctrl.pose_msg.pose.position.x = tmp[0]
+    # ctrl.pose_msg.pose.position.y = tmp[1]
+    # ctrl.pose_msg.pose.position.z = tmp[2]
     
     ctrl.pose_publisher.publish(ctrl.pose_msg)
 
-    time.sleep(6)
+    time.sleep(wait_time + 3)
 
     # imshow
     cv2.imshow('POI', ctrl.img)
@@ -157,7 +210,7 @@ if __name__ == "__main__":
         ctrl.get_quaternion_from_euler(0, 0, yaw)
 
         ctrl.pose_publisher.publish(ctrl.pose_msg)
-        time.sleep(3)
+        time.sleep(wait_time)
 
         # imshow
         cv2.imshow('POI', ctrl.img)
@@ -165,7 +218,7 @@ if __name__ == "__main__":
         ctrl.count += 1
         cv2.waitKey(25)
     
-    if ctrl.poi[2] >= 2.5:
+    if ctrl.poi[first_idx][2] >= 2.5: # tmp -> ctrl.poi
         ctrl.pose_msg.pose.position.z = ctrl.poi[2] - 2
 
         for i in range(8):
@@ -173,7 +226,7 @@ if __name__ == "__main__":
             ctrl.get_quaternion_from_euler(0, 0, yaw)
 
             ctrl.pose_publisher.publish(ctrl.pose_msg)
-            time.sleep(3)
+            time.sleep(wait_time)
 
             # imshow
             cv2.imshow('POI', ctrl.img)
@@ -181,7 +234,7 @@ if __name__ == "__main__":
             ctrl.count += 1
             cv2.waitKey(25)
         
-    if ctrl.poi[2] <= 12.5:
+    if ctrl.poi[first_idx][2] <= 12.5:
         ctrl.pose_msg.pose.position.z = ctrl.poi[2] + 2
 
         for i in range(8):
@@ -197,7 +250,7 @@ if __name__ == "__main__":
             ctrl.count += 1
             cv2.waitKey(25)
     
-    if ctrl.poi[2] <= 10.5:
+    if ctrl.poi[first_idx][2] <= 10.5:
         ctrl.pose_msg.pose.position.z = ctrl.poi[2] + 4
 
         for i in range(8):
@@ -205,7 +258,7 @@ if __name__ == "__main__":
             ctrl.get_quaternion_from_euler(0, 0, yaw)
 
             ctrl.pose_publisher.publish(ctrl.pose_msg)
-            time.sleep(3)
+            time.sleep(wait_time)
 
             # imshow
             cv2.imshow('POI', ctrl.img)
