@@ -266,7 +266,7 @@ if __name__ == "__main__" :
         # ax.scatter(0, 0)
         # # ax.title('2D')
 
-        print(time.time() - mp.time_total)
+        # print(time.time() - mp.time_total)
         # plt.show()
         mp.time_total = time.time()
 

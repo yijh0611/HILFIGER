@@ -118,14 +118,14 @@ if __name__ == "__main__":
 
     # request poi
     get_poi = Int32()
-    tmp = input('Type which poi')
+    tmp = int(input('Type which poi'))
     if tmp > 9:
         tmp = 9
     elif tmp < 0:
         tmp = 0
     get_poi.data = int(tmp)
 
-    for i in range(2):
+    for i in range(1):
         # 오래동안 publish 안했으면 처음거는 버려지기 때문에 2개를 Publish 해야 정보를 받을 수 있다.
         ctrl.pub_get_poi.publish(get_poi)
         time.sleep(0.1)
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     time.sleep(3)
 
     print(np.shape(ctrl.poi))
-    print(ctrl.poi)    
+    print(ctrl.poi)
 
     print('Move to POI')
     ctrl.pose_msg.pose.position.x = ctrl.poi[0]
