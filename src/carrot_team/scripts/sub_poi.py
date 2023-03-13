@@ -24,10 +24,11 @@ class GetPOI:
         self.pub_poi = rospy.Publisher('/carrot_team/poi', Float32MultiArray, queue_size=10)
         self.pub_is_poi_ready = rospy.Publisher('/carrot_team/is_poi_ready', Bool, queue_size=10)
         self.is_poi_ready = False
+        
+        t = threading.Thread(target = self.pub_is_poi_thread)
+        t.start()
 
         rospy.spin()
-        # t = threading.Thread(target = self.ros_spin)
-        # t.start
 
     def get_poi(self, msg):
         for i in range(len(msg.poi)):
@@ -54,17 +55,36 @@ class GetPOI:
             
             # publish data
             self.pub_poi.publish(poi_msg)
+        else:
+            # publish all the data
+            for i in range(len(self.poi)):
+                # data to publish
+                poi_msg = Float32MultiArray()
+                poi_msg.data = self.poi[msg.data]
+                
+                # publish data
+                self.pub_poi.publish(poi_msg)
+                time.sleep(0.05)
     
+    def pub_is_poi_thread(self):
+        while True:
+            msg = Bool()
+            msg.data = self.is_poi_ready
+
+            self.pub_is_poi_ready.publish(msg)
+
+            time.sleep(0.1)
+
     def ros_spin(self):
         rospy.spin()
 
 if __name__ == "__main__":
     poi = GetPOI()
 
-    while True:
-        msg = Bool()
-        msg.data = poi.is_poi_ready
+    # while True:
+    #     msg = Bool()
+    #     msg.data = poi.is_poi_ready
 
-        poi.pub_is_poi_ready(msg)
+    #     poi.pub_is_poi_ready(msg)
 
-        time.sleep(0.1)
+    #     time.sleep(0.1)
