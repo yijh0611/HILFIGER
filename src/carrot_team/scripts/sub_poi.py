@@ -47,8 +47,6 @@ class GetPOI:
         self.is_poi_ready = True
     
     def sub_poi_when_request(self, msg):
-        
-
         if msg.data < len(self.poi):
             # data to publish
             poi_msg = Float32MultiArray()
