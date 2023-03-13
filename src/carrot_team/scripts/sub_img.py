@@ -87,7 +87,7 @@ def image_callback_depth(msg):
     dim2 = MultiArrayDimension()
     dim1.label = "width"
     dim1.size = img_data.shape[1]
-    dim2.siride = 1
+    dim2.stride = 1
 
     img_array.layout.dim.append(dim1)
     img_array.layout.dim.append(dim2)
