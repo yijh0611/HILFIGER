@@ -124,11 +124,11 @@ if __name__ == "__main__":
     
     ctrl.pose_publisher.publish(ctrl.pose_msg)
 
-    time.sleep(3)
+    time.sleep(6)
 
     # imshow
     cv2.imshow('POI', ctrl.img)
-    cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', ctrl.img)
+    cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}.jpg', ctrl.img)
     ctrl.count += 1
     cv2.waitKey(25)
 
@@ -142,7 +142,7 @@ if __name__ == "__main__":
 
         # imshow
         cv2.imshow('POI', ctrl.img)
-        cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', ctrl.img)
+        cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}.jpg', ctrl.img)
         ctrl.count += 1
         cv2.waitKey(25)
     
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
             # imshow
             cv2.imshow('POI', ctrl.img)
-            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', ctrl.img)
+            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}.jpg', ctrl.img)
             ctrl.count += 1
             cv2.waitKey(25)
         
@@ -174,7 +174,23 @@ if __name__ == "__main__":
 
             # imshow
             cv2.imshow('POI', ctrl.img)
-            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', ctrl.img)
+            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}.jpg', ctrl.img)
+            ctrl.count += 1
+            cv2.waitKey(25)
+    
+    if ctrl.poi[2] <= 10.5:
+        ctrl.pose_msg.pose.position.z = ctrl.poi[2] + 4
+
+        for i in range(8):
+            yaw = res * i
+            ctrl.get_quaternion_from_euler(0, 0, yaw)
+
+            ctrl.pose_publisher.publish(ctrl.pose_msg)
+            time.sleep(3)
+
+            # imshow
+            cv2.imshow('POI', ctrl.img)
+            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}.jpg', ctrl.img)
             ctrl.count += 1
             cv2.waitKey(25)
         
