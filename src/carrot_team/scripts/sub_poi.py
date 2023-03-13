@@ -57,14 +57,23 @@ class GetPOI:
             self.pub_poi.publish(poi_msg)
         else:
             # publish all the data
-            for i in range(len(self.poi)):
-                # data to publish
-                poi_msg = Float32MultiArray()
-                poi_msg.data = self.poi[msg.data]
+            # for i in range(len(self.poi)):
+            #     # data to publish
+            #     poi_msg = Float32MultiArray()
+            #     poi_msg.data = self.poi[i]
                 
-                # publish data
-                self.pub_poi.publish(poi_msg)
-                time.sleep(0.05)
+            #     # publish data
+            #     self.pub_poi.publish(poi_msg)
+            #     time.sleep(0.1)
+
+            # publish all in single array
+            tmp = np.reshape(self.poi, (-1))
+            print(tmp)
+            poi_msg = Float32MultiArray()
+            poi_msg.data = tmp
+
+            # publish data
+            self.pub_poi.publish(poi_msg)
     
     def pub_is_poi_thread(self):
         while True:
