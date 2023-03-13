@@ -3,6 +3,7 @@
 import cv2
 import math
 import numpy as np
+import os
 import rospy
 import threading
 import time
@@ -127,7 +128,7 @@ if __name__ == "__main__":
 
     # imshow
     cv2.imshow('POI', ctrl.img)
-    cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', img)
+    cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', ctrl.img)
     ctrl.count += 1
     cv2.waitKey(25)
 
@@ -141,7 +142,7 @@ if __name__ == "__main__":
 
         # imshow
         cv2.imshow('POI', ctrl.img)
-        cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', img)
+        cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', ctrl.img)
         ctrl.count += 1
         cv2.waitKey(25)
     
@@ -157,7 +158,7 @@ if __name__ == "__main__":
 
             # imshow
             cv2.imshow('POI', ctrl.img)
-            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', img)
+            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', ctrl.img)
             ctrl.count += 1
             cv2.waitKey(25)
         
@@ -173,7 +174,7 @@ if __name__ == "__main__":
 
             # imshow
             cv2.imshow('POI', ctrl.img)
-            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', img)
+            cv2.imwrite(f'{ctrl.src}/img_{ctrl.count}', ctrl.img)
             ctrl.count += 1
             cv2.waitKey(25)
         
