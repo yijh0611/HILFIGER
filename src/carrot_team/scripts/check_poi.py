@@ -187,12 +187,9 @@ if __name__ == "__main__":
             break
 
     print('Move to POI')
-    ctrl.pose_msg.pose.position.x = ctrl.poi[first_idx][0]
-    ctrl.pose_msg.pose.position.y = ctrl.poi[first_idx][1]
-    ctrl.pose_msg.pose.position.z = ctrl.poi[first_idx][2]
-    # ctrl.pose_msg.pose.position.x = tmp[0]
-    # ctrl.pose_msg.pose.position.y = tmp[1]
-    # ctrl.pose_msg.pose.position.z = tmp[2]
+    ctrl.pose_msg.pose.position.x = ctrl.poi[first_idx, 0]
+    ctrl.pose_msg.pose.position.y = ctrl.poi[first_idx, 1]
+    ctrl.pose_msg.pose.position.z = ctrl.poi[first_idx, 2]
     
     ctrl.pose_publisher.publish(ctrl.pose_msg)
 
@@ -218,8 +215,8 @@ if __name__ == "__main__":
         ctrl.count += 1
         cv2.waitKey(25)
     
-    if ctrl.poi[first_idx][2] >= 2.5: # tmp -> ctrl.poi
-        ctrl.pose_msg.pose.position.z = ctrl.poi[2] - 2
+    if ctrl.poi[first_idx, 2] >= 2.5: # tmp -> ctrl.poi
+        ctrl.pose_msg.pose.position.z = ctrl.poi[first_idx, 2] - 2
 
         for i in range(8):
             yaw = res * i
@@ -234,8 +231,8 @@ if __name__ == "__main__":
             ctrl.count += 1
             cv2.waitKey(25)
         
-    if ctrl.poi[first_idx][2] <= 12.5:
-        ctrl.pose_msg.pose.position.z = ctrl.poi[2] + 2
+    if ctrl.poi[first_idx, 2] <= 12.5:
+        ctrl.pose_msg.pose.position.z = ctrl.poi[first_idx, 2] + 2
 
         for i in range(8):
             yaw = res * i
@@ -250,8 +247,8 @@ if __name__ == "__main__":
             ctrl.count += 1
             cv2.waitKey(25)
     
-    if ctrl.poi[first_idx][2] <= 10.5:
-        ctrl.pose_msg.pose.position.z = ctrl.poi[2] + 4
+    if ctrl.poi[first_idx, 2] <= 10.5:
+        ctrl.pose_msg.pose.position.z = ctrl.poi[first_idx, 2] + 4
 
         for i in range(8):
             yaw = res * i
