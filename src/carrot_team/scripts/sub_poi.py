@@ -26,7 +26,7 @@ class GetPOI:
         self.is_poi_ready = False
         
         t = threading.Thread(target = self.pub_is_poi_thread)
-        t.start
+        t.start()
 
         rospy.spin()
 
@@ -61,7 +61,7 @@ class GetPOI:
             msg = Bool()
             msg.data = self.is_poi_ready
 
-            self.pub_is_poi_ready(msg)
+            self.pub_is_poi_ready.publish(msg)
 
             time.sleep(0.1)
 
