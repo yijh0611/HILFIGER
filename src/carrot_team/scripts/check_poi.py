@@ -11,6 +11,7 @@ import time
 from cv_bridge import CvBridge # Change ros image into opencv
 from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import Image # Subscribe image
+from std_msgs.msg import Bool
 from std_msgs.msg import Int32
 from std_msgs.msg import Float32MultiArray
 
@@ -21,6 +22,7 @@ class Search:
         rospy.init_node('search_poi', anonymous=True)
         rospy.Subscriber('/carrot_team/poi', Float32MultiArray, self.get_poi)
         rospy.Subscriber('/red/camera/color/image_raw', Image, self.image_callback)
+        rospy.Subscriber('/carrot_team/is_poi_ready', Bool, self.is_poi_callback)
 
         self.pub_get_poi = rospy.Publisher('/carrot_team/req_poi', Int32, queue_size=10)
         # control message
@@ -39,6 +41,9 @@ class Search:
         self.pose_msg.pose.orientation.w = 1.0  # set the w orientation
 
         self.yaw = 0
+
+        # is poi ready
+        self.is_poi = False
 
         # image
         self.bridge = CvBridge() # Get drone image
@@ -96,15 +101,29 @@ class Search:
     def image_callback(self, msg):
         self.img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
 
-
+    def is_poi_callback(self, msg):
+        self.is_poi = msg.data
 
 if __name__ == "__main__":
     # call class
     ctrl = Search()
 
+    time_start = time.time()
+    # Wait until poi is recieved
+    while ctrl.is_poi == False:
+        time.sleep(0.1)
+        if time.time() - time_start > 10:
+            # When 10s is passed
+            exit()
+
     # request poi
     get_poi = Int32()
-    get_poi.data = 9
+    tmp = input('Type which poi')
+    if tmp > 9:
+        tmp = 9
+    elif tmp < 0:
+        tmp = 0
+    get_poi.data = int(tmp)
 
     for i in range(2):
         # 오래동안 publish 안했으면 처음거는 버려지기 때문에 2개를 Publish 해야 정보를 받을 수 있다.
