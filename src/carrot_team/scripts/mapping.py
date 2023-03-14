@@ -18,6 +18,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Bool # Is get poi ready
 from std_msgs.msg import Float64 # get yaw
+from std_msgs.msg import Int32MultiArray, MultiArrayDimension # Publish map in 3D Array
 
 
 class Mapping:
@@ -101,8 +102,14 @@ class Mapping:
         rospy.Subscriber('/red/carrot/pose', PoseStamped, self.get_pose)
         rospy.Subscriber('/carrot_team/is_poi_ready', Bool, self.is_poi_callback)
 
+        # Publish map
+        self.pub_map = rospy.Publisher('/carrot_team/map', Int32MultiArray, queue_size = 10)
+
         t = threading.Thread(target = self.ros_spin)
+        t_pub_map = threading.Thread(target = self.publish_map)
+        
         t.start()
+        t_pub_map.start()
     
     def ros_spin(self):
         rospy.spin()
@@ -155,6 +162,39 @@ class Mapping:
 
     def is_poi_callback(self, msg):
         self.is_poi = msg.data
+    
+    def publish_map(self):
+        while True:
+            array = self.map_np * 1
+            array_flat = np.reshape(self.map_np, -1).astype(np.int32)
+
+            # print(np.shape(array))
+
+            msg = Int32MultiArray()
+            # msg.data = sum(array, []) # flatten the 3D array to 1D list
+            msg.data = list(array_flat)
+
+            dim_height = MultiArrayDimension()
+            dim_height.label = "height"
+            dim_height.size = len(array)
+            dim_height.stride = len(array[0]) * len(array[0][0])
+            msg.layout.dim.append(dim_height)
+
+            dim_width = MultiArrayDimension()
+            dim_width.label = "width"
+            dim_width.size = len(array[0])
+            dim_width.stride = len(array[0][0])
+            msg.layout.dim.append(dim_width)
+
+            dim_depth = MultiArrayDimension()
+            dim_depth.label = "depth"
+            dim_depth.size = len(array[0][0])
+            dim_depth.stride = 1
+            msg.layout.dim.append(dim_depth)            
+            
+            self.pub_map.publish(msg)
+            
+            time.sleep(0.1)
 
 
 if __name__ == "__main__" :
@@ -167,7 +207,7 @@ if __name__ == "__main__" :
         time.sleep(1)
         if time.time() - time_is_poi > 40:
             print('POI not ready; Error!')
-            # exit()
+            break
 
     while True:
         width = 640
