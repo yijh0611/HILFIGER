@@ -16,11 +16,15 @@ from cv_bridge import CvBridge # Change ros image into opencv
 from geometry_msgs.msg import PoseStamped
 from mpl_toolkits.mplot3d import Axes3D
 from sensor_msgs.msg import Image # Subscribe image
+from std_msgs.msg import Bool # Is get poi ready
 from std_msgs.msg import Float64 # get yaw
 
 
 class Mapping:
     def __init__(self):
+        # is get POI end
+        self.is_poi = False
+
         # Set variables
         self.x_size = 21 # 15 in introduction
         self.y_size = 51 # 50 in introduction
@@ -95,6 +99,7 @@ class Mapping:
         rospy.Subscriber('/red/camera/depth/image_raw', Image, self.image_callback_depth)
         rospy.Subscriber('/red/carrot/yaw', Float64, self.yaw_rad) # /red/uav/yaw 도 있는데, 값이 크게 차이나지는 않는거 같아서 그냥 이거 썼다.
         rospy.Subscriber('/red/carrot/pose', PoseStamped, self.get_pose)
+        rospy.Subscriber('/carrot_team/is_poi_ready', Bool, self.is_poi_callback)
 
         t = threading.Thread(target = self.ros_spin)
         t.start()
@@ -148,9 +153,21 @@ class Mapping:
 
         return r_x, r_y
 
+    def is_poi_callback(self, msg):
+        self.is_poi = msg.data
+
 
 if __name__ == "__main__" :
     mp = Mapping()
+
+    print("Waiting 40s until POI is ready")
+    # Wait until POI is recieved
+    time_is_poi = time.time()
+    while mp.is_poi == False:
+        time.sleep(1)
+        if time.time() - time_is_poi > 40:
+            print('POI not ready; Error!')
+            # exit()
 
     while True:
         width = 640
@@ -278,19 +295,6 @@ if __name__ == "__main__" :
             # ax.title('2D')
             
             # # plt.show()
-
-            # # 안됨
-            # fig = plt.gcf()
-            # fig.canvas.draw()
-            # image = np.array(fig.canvas.renderer.buffer_rgba())
-            # print(image.size)
-            # print(image)
-            # print(np.shape(image))
-
-            # # Convert RGBA to BGR format
-            # height, width, channels = image.shape
-            # image = cv2.UMat(np.zeros((height, width, 3), dtype=np.uint8))
-            # cv2.cvtColor(image, cv2.COLOR_RGBA2BGR, 3, image)
 
             # 이미지 저장 후 다시 불러와서 imshow
             filename = 'plot.png'
