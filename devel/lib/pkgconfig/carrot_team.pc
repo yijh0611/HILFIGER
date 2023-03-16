@@ -1,0 +1,8 @@
+prefix=/root/uav_ws/src/icuas23_competition/HILFIGER/devel
+
+Name: carrot_team
+Description: Description of carrot_team
+Version: 0.0.0
+Cflags: -I/root/uav_ws/src/icuas23_competition/HILFIGER/devel/include -I/root/uav_ws/src/icuas23_competition/HILFIGER/src/carrot_team/include
+Libs: -L${prefix}/lib -lcarrot_team
+Requires: geometry_msgs roscpp rospy trajectory_msgs sensor_msgs

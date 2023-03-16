@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /root/uav_ws/src/icuas23_competition/HILFIGER/devel/setup.sh
