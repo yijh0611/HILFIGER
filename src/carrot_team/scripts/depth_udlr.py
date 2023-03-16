@@ -91,19 +91,22 @@ class DepthUDLR:
         # print(np.shape(tmp)) # 480, 640
         for i in range(0, 479, 15):
             for j in range(0, 639, 16):
-                w, d, h = self.get_dist(tmp[i][j], j, i)
-                if d <= d_lim:
-                    if 0 <= h <= lim:
-                        bool_array[0] = 0
+                if (i < 55 and j > 115 and j < 177) or (i > 585 and j > 115 and j < 177):
+                    pass
+                else:
+                    w, d, h = self.get_dist(tmp[i][j], j, i)
+                    if d <= d_lim:
+                        if 0 <= h <= lim:
+                            bool_array[0] = 0
 
-                    if -1 * lim <= h <= 0:
-                        bool_array[1] = 0
+                        if -1 * lim <= h <= 0:
+                            bool_array[1] = 0
 
-                    if -1 * lim <= w <= 0 :
-                        bool_array[2] = 0
-                    
-                    if 0 <= w <= lim:
-                        bool_array[3] = 0
+                        if -1 * lim <= w <= 0 :
+                            bool_array[2] = 0
+                        
+                        if 0 <= w <= lim:
+                            bool_array[3] = 0
 
 
         # Publish data
@@ -121,6 +124,11 @@ class DepthUDLR:
         self.img_depth = tmp
         self.img_depth[np.isnan(tmp)] = 10.0
         self.img_depth /= 10
+        self.img_depth[115, :] = 0
+        self.img_depth[145, :] = 0
+        self.img_depth[177, :] = 0
+        self.img_depth[:, 55] = 0
+        self.img_depth[:, 585] = 0
 
         cv2.imshow('Depth image', self.img_depth)
         cv2.waitKey(25)
