@@ -83,9 +83,10 @@ class DepthUDLR:
         tmp = np.array(self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')) * 1
 
         # Array for publishing
-        bool_array = [1, 1, 1, 1] # Up, Down, Left, Right
+        bool_array = [1, 1, 1, 1, 1] # Up, Down, Left, Right, Front
 
         d_lim = 2
+        d_lim_2 = 1.5
         lim = 1
 
         # print(np.shape(tmp)) # 480, 640
@@ -96,25 +97,31 @@ class DepthUDLR:
                 else:
                     w, d, h = self.get_dist(tmp[i][j], j, i)
                     if d <= d_lim:
-                        if 0 <= h <= lim:
+                        if 0.5 <= h <= lim:
                             bool_array[0] = 0
 
-                        if -1 * lim <= h <= 0:
+                        if -1 * lim <= h <= -0.5:
                             bool_array[1] = 0
 
-                        if -1 * lim <= w <= 0 :
+                        if -1 * lim <= w <= -0.5:
                             bool_array[2] = 0
                         
-                        if 0 <= w <= lim:
+                        if 0.5 <= w <= lim:
                             bool_array[3] = 0
+                        
+                        if d <= d_lim_2:
+                            # Front
+                            if -0.5 <= h <= 0.5:
+                                if -0.5 <= w <= 0.5:
+                                    bool_array[4] = 0
 
 
         # Publish data
         bool_pub = UInt8MultiArray()
         bool_pub.data = bool_array
 
-        bool_pub.layout.dim.append(Dimension(label="rows", size=1, stride=4))
-        bool_pub.layout.dim.append(Dimension(label="cols", size=4, stride=1))
+        bool_pub.layout.dim.append(Dimension(label="rows", size=1, stride=5))
+        bool_pub.layout.dim.append(Dimension(label="cols", size=5, stride=1))
 
         print(bool_array)
         self.pub_udlr.publish(bool_pub)
@@ -124,8 +131,8 @@ class DepthUDLR:
         self.img_depth = tmp
         self.img_depth[np.isnan(tmp)] = 10.0
         self.img_depth /= 10
-        self.img_depth[115, :] = 0
-        self.img_depth[145, :] = 0
+        self.img_depth[100, :] = 0
+        # self.img_depth[145, :] = 0
         self.img_depth[177, :] = 0
         self.img_depth[:, 55] = 0
         self.img_depth[:, 585] = 0
