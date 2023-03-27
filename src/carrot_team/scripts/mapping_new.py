@@ -26,7 +26,7 @@ class Mapping:
         # is get POI end
         self.is_poi = False
 
-        # Constant
+        # Constant variable
         self.WIDTH = 640
         self.HEIGHT = 480
         
@@ -106,7 +106,7 @@ class Mapping:
 
         # change prop range
         self.PROP_W_S = self.PROP_W_S // self.W_SKIP
-        self.PROP_W_L = self.PROP_W_L // self.H_SKIP
+        self.PROP_W_L = self.PROP_W_L // self.W_SKIP
         self.PROP_H_S = self.PROP_H_S // self.H_SKIP
         self.PROP_H_L = self.PROP_H_L // self.H_SKIP
         
@@ -126,7 +126,7 @@ class Mapping:
             if w >= 0:
                 w += 1
             
-            rad_w = math.atan((math.tan(self.W_RAD / 2) * w) / self.H_RAD)
+            rad_w = math.atan((math.tan(self.W_RAD / 2) * w) / self.W_HALF)
             self.W_LIST = np.append(self.W_LIST, rad_w)
             self.W_TAN = np.append(self.W_TAN, math.tan(rad_w))
 
@@ -134,7 +134,8 @@ class Mapping:
         self.H_LIST = self.H_LIST[::self.H_SKIP]
         self.W_LIST = self.W_LIST[::self.W_SKIP]
         self.H_TAN = self.H_TAN[::self.H_SKIP]
-        self.W_TAN = self.W_TAN[::self.H_SKIP]
+        self.W_TAN = self.W_TAN[::self.W_SKIP]
+
         # Change shape to horizontal array
         self.H_LIST = np.reshape(self.H_LIST, (-1, 1))
         self.H_TAN = np.reshape(self.H_TAN, (-1, 1))
@@ -225,6 +226,37 @@ class Mapping:
             
             time.sleep(0.1)
 
+    def del_idx(self, x, y, z, idx):
+        x = np.delete(x, idx)
+        y = np.delete(y, idx)
+        z = np.delete(z, idx)
+
+        return x, y, z
+
+    def del_range(self, x, y, z):
+        # x < 0
+        idx = np.where(x < 0)[0]
+        x, y, z = self.del_idx(x, y, z, idx)
+
+        idx = np.where(x > self.x_size)[0]
+        x, y, z = self.del_idx(x, y, z, idx)
+
+        # y < 0
+        idx = np.where(y < 0)[0]
+        x, y, z = self.del_idx(x, y, z, idx)
+
+        idx = np.where(y > self.y_size)[0]
+        x, y, z = self.del_idx(x, y, z, idx)
+
+        # z < 0
+        idx = np.where(z < 0)[0]
+        x, y, z = self.del_idx(x, y, z, idx)
+
+        idx = np.where(z > self.z_size)[0]
+        x, y, z = self.del_idx(x, y, z, idx)
+
+        return x, y, z
+
 
 if __name__ == "__main__" :
     mp = Mapping()
@@ -272,7 +304,7 @@ if __name__ == "__main__" :
                 # change nan to 10
                 img_d_y = np.nan_to_num(mp.img_depth, nan = 10) * mp.mask
                 img_d_y = img_d_y[::mp.H_SKIP,::mp.W_SKIP]
-                img_d_x = img_d_y * mp.H_SKIP
+                img_d_x = img_d_y * mp.W_TAN
                 img_d_z = img_d_y * mp.H_TAN
 
                 img_d_x_new = cy * img_d_x - sy * img_d_y # rotated
@@ -310,32 +342,60 @@ if __name__ == "__main__" :
                     map_y = (mp.drone_pose[1] - wall_x).astype(int)
                     map_z = (mp.drone_pose[2] + wall_z).astype(int)
                     
-                    for i in range(len(wall_x)):
+                    # Del values out of range
+                    map_x, map_y, map_z = mp.del_range(map_x, map_y, map_z)
+
+                    count = 0
+
+                    for i in range(len(map_x)):
                         mx = map_x[i]
                         my = map_y[i]
                         mz = map_z[i]
 
                         mp.wall_np[mx, my, mz] += 10
+
                         if mp.wall_np[mx, my, mz] >= mp.open_np[mx, my, mz]:
                             mp.map_np[mx, my, mz] = 2 # Wall
                             mp.map_img[mx, my, mz, 2] = 125 # 빨간색
 
+                    # for i in range(len(wall_x)):
+                    #     mx = map_x[i]
+                    #     my = map_y[i]
+                    #     mz = map_z[i]
+                    #     # if mx >= mp.x_size or mz < 0 or my >= mp.y_size:
+                    #     #     count += 1
+                    #     # if mx < 0:
+                    #     #     count += 1
+                    #     try:
+                    #         mp.wall_np[mx, my, mz] += 10
+                    #         if mp.wall_np[mx, my, mz] >= mp.open_np[mx, my, mz]:
+                    #             mp.map_np[mx, my, mz] = 2 # Wall
+                    #             mp.map_img[mx, my, mz, 2] = 125 # 빨간색
+                    #     except:
+                    #         count += 1
+                    # print(count, '/', len(wall_x))
 
 
 
-                        # map_x = int(mp.drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
-                        # map_y = int(mp.drone_pose[1] - wall_x[i])
-                        # map_z = int(mp.drone_pose[2] + wall_z[i])
+
+                    #     map_x = int(mp.drone_pose[0] + wall_y[i]) # !! 드론에 더 가까운 쪽으로 벽을 만들 필요가 있기 때문에, 그냥 int를 쓰면 안되고 상황에 따라서 +- 1을 해야한다. - 일단 맵이 어떻게 되는지 확인 후 기능 추가
+                    #     map_y = int(mp.drone_pose[1] - wall_x[i])
+                    #     map_z = int(mp.drone_pose[2] + wall_z[i])
                         
-                        # # try:
-                        # mp.wall_np[map_x, map_y, map_z] += 10
-                        # # # if mp.map_np[map_x, map_y, map_z] == 0:
-                        # if mp.wall_np[map_x, map_y, map_z] >= mp.open_np[map_x, map_y, map_z]:
-                        #     mp.map_np[map_x, map_y, map_z] = 2 # Wall
-                        #     mp.map_img[map_x, map_y, map_z, 2] = 125 # 빨간색
-                        # except:
-                        #     count += 1
-                    # print(f"Error mapping wall {count}/{len(wall_x)} times")
+                    #     try:
+                    #         mp.wall_np[map_x, map_y, map_z] += 10
+                    #         # # if mp.map_np[map_x, map_y, map_z] == 0:
+                    #         if mp.wall_np[map_x, map_y, map_z] >= mp.open_np[map_x, map_y, map_z]:
+                    #             mp.map_np[map_x, map_y, map_z] = 2 # Wall
+                    #             print(mp.x_size - map_x, mp.y_size - map_y, map_z, 2)
+                    #             print(mp.y_size)
+                    #             print(map_y)
+                    #             mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, 2] = 125 # 빨간색
+                    #         #   mp.map_img[map_x, map_y, map_z, 2] = 125 # 빨간색
+                    #     except:
+                    #         # count += 1
+                    #         pass
+                    # # print(f"Error mapping wall {count}/{len(wall_x)} times")
                     
                     for i in range(len(open_x)):
                         map_x = int(mp.drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
@@ -348,16 +408,18 @@ if __name__ == "__main__" :
                             if mp.open_np[map_x, map_y, map_z] > mp.wall_np[map_x, map_y, map_z] * 10:
                                 mp.map_np[map_x, map_y, map_z] = 1 # Open space
                                 mp.map_img[map_x, map_y, map_z, :] = 125
+                                # mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, :] = 125
                                 # print(map_x, map_y, map_z)
                         except:
                             pass
 
                 mul = 20
-                # mp.map_img_tmp = np.flip(mp.map_img, (0,1))
                 mp.map_img_tmp = mp.map_img * 1
+                mp.map_img_tmp = np.flip(mp.map_img, (0,1))
                 # print(np.shape(mp.map_img_tmp))
 
                 img = cv2.resize(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul))
+                cv2.imwrite('/root/pic/global_map.png', img)
                 cv2.imshow('Global map', img)
                 key = cv2.waitKey(10)
 
