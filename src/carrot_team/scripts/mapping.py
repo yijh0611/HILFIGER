@@ -190,13 +190,13 @@ class Mapping:
             dim_depth.label = "depth"
             dim_depth.size = len(array[0][0])
             dim_depth.stride = 1
-            msg.layout.dim.append(dim_depth)            
+            msg.layout.dim.append(dim_depth)
             
             self.pub_map.publish(msg)
             
             time.sleep(0.1)
 
-
+    
 if __name__ == "__main__" :
     mp = Mapping()
 
@@ -229,7 +229,10 @@ if __name__ == "__main__" :
         for i in range(80, 420, 5): # 60 ~ 420
             # if i % 5 == 0:
                 for j in range(64, 576, 5):
-                    # if j % 5 == 0:
+                    # 아직 수정안했는데, 맞는지 확인해보기
+                    if (i < 60 and j > 100 and j < 177) or (i > 580 and j > 100 and j < 177): # 범위 잘못된거 같다. i가 세로이기 때문에 i랑 j 랑 수정 필요
+                        pass
+                    else:
                         d = mp.img_depth[i][j]
                         isNaN = np.isnan(d)
                         if isNaN:
