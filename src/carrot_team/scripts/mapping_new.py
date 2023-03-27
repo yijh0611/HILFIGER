@@ -351,12 +351,15 @@ if __name__ == "__main__" :
                         mx = map_x[i]
                         my = map_y[i]
                         mz = map_z[i]
+                        
+                        try:
+                            mp.wall_np[mx, my, mz] += 10
 
-                        mp.wall_np[mx, my, mz] += 10
-
-                        if mp.wall_np[mx, my, mz] >= mp.open_np[mx, my, mz]:
-                            mp.map_np[mx, my, mz] = 2 # Wall
-                            mp.map_img[mx, my, mz, 2] = 125 # 빨간색
+                            if mp.wall_np[mx, my, mz] >= mp.open_np[mx, my, mz]:
+                                mp.map_np[mx, my, mz] = 2 # Wall
+                                mp.map_img[mx, my, mz, 2] = 125 # 빨간색
+                        except:
+                            pass
 
                     # for i in range(len(wall_x)):
                     #     mx = map_x[i]
