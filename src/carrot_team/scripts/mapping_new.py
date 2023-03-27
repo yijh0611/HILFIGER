@@ -61,6 +61,15 @@ class Mapping:
         self.drone_yaw = 0
         self.drone_pose = np.array([0, 0, 0])
         self.time_is_map = time.time()
+        
+        # prop mask
+        self.mask = np.ones((self.h, self.w))
+        for i in range(100,177):
+            for j in range(60):
+                self.mask[i][j] = 0
+            for j in range(580,640):
+                self.mask[i][j] = 0
+
 
         ########## Radian array cal start ##########
         # get radian - To reduce calculation
@@ -77,6 +86,8 @@ class Mapping:
         self.prop_w_l = 580
         self.prop_h_s = 100
         self.prop_h_l = 180 # 177
+
+        self.res = 10 # open space mapping resolution
 
         # Change if necessary
         self.w_rad = math.radians(87)
@@ -175,24 +186,24 @@ class Mapping:
 
         self.drone_pose = tmp
 
-    def get_dist(self, d, w, h, w_all = 640, h_all = 480, rad_cam_w = math.radians(87), rad_cam_h = math.radians(58)): # 앞에거가 원래 58이었음.
-        rad_w = self.w_list[w]
-        rad_h = self.h_list[h]
+    # def get_dist(self, d, w, h, w_all = 640, h_all = 480, rad_cam_w = math.radians(87), rad_cam_h = math.radians(58)): # 앞에거가 원래 58이었음.
+    #     rad_w = self.w_list[w]
+    #     rad_h = self.h_list[h]
 
-        dist_x = d * math.tan(rad_w)
-        dist_y = d
-        dist_z = d * math.tan(rad_h)
+    #     dist_x = d * math.tan(rad_w)
+    #     dist_y = d
+    #     dist_z = d * math.tan(rad_h)
 
-        return dist_x, dist_y, dist_z
+    #     return dist_x, dist_y, dist_z
 
-    def get_r(self, d, n, w = 640, rad_cam = math.radians(58)):
-        w_half = w // 2
-        rad_cam_half = rad_cam / 2
+    # def get_r(self, d, n, w = 640, rad_cam = math.radians(58)):
+    #     w_half = w // 2
+    #     rad_cam_half = rad_cam / 2
 
-        r_x = (n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
-        r_y = (w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
+    #     r_x = (n) / (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2)**0.5
+    #     r_y = (w_half) / (math.tan(rad_cam_half) * (n ** 2 + (w_half / math.tan(rad_cam_half)) ** 2) ** 0.5)
 
-        return r_x, r_y
+    #     return r_x, r_y
 
     def is_poi_callback(self, msg):
         self.is_poi = msg.data
@@ -234,9 +245,10 @@ class Mapping:
 if __name__ == "__main__" :
     mp = Mapping()
 
-    print("Waiting 40s until POI is ready")
     # Wait until POI is recieved
+    print("Waiting 40s until POI is ready")
     time_is_poi = time.time()
+
     while mp.is_poi == False:
         time.sleep(1)
         if time.time() - time_is_poi > 40:
@@ -263,49 +275,41 @@ if __name__ == "__main__" :
         sy = math.sin(mp.drone_yaw)
 
         # change nan to 10
-        img_d_y = np.nan_to_num(mp.img_depth[::mp.h_skip,::mp.w_skip], nan = 10)
+        img_d_y = np.nan_to_num(mp.img_depth, nan = 10) * mp.mask
+        img_d_y = img_d_y[::mp.h_skip,::mp.w_skip]
         img_d_x = img_d_y * mp.w_tan
         img_d_z = img_d_y * mp.h_tan
 
         img_d_x_new = cy * img_d_x - sy * img_d_y # rotated
         img_d_y_new = cy * img_d_y + sy * img_d_x # rotated
 
+        # flatten
+        d_flat = np.reshape(img_d_y, (-1))
+        d_y_flat = np.reshape(img_d_y_new, (-1))
+        d_x_flat = np.reshape(img_d_x_new, (-1))
+        d_z_flat = np.reshape(img_d_z, (-1))
 
-        # 두번째 버전 만들 때는 어차피 거리는 0이 될 일이 없으니까, 1이랑 0으로 이루어진 프로펠러 마스크를 미리 만들어 두고
-        # np reshape로 모양 통일한 뒤 0인거는 제거
-        for i in range(80 // mp.h_skip, 420 // mp.h_skip): # 60 ~ 420
-            for j in range(64 // mp.w_skip , 576 // mp.w_skip):
+        # remove propeller
+        idx = np.array(np.nonzero(d_flat))[0]
+        d_flat = d_flat[idx]
+        d_y_flat = d_y_flat[idx]
+        d_x_flat = d_x_flat[idx]
+        d_z_flat = d_z_flat[idx]
 
-                if (j <= mp.prop_w_s and i >= mp.prop_h_s and i <= mp.prop_h_l) or (j >= mp.prop_w_l and i >= mp.prop_h_s and i <= mp.prop_h_l):
-                    pass
-                else:
-                    # 미완성
+        # Open space
+        for i in range(1, mp.res):
+            open_x = np.append(open_x, d_x_flat * i / mp.res)
+            open_y = np.append(open_y, d_y_flat * i / mp.res)
+            open_z = np.append(open_z, d_z_flat * i / mp.res)
+
+        # wall mapping
+        idx = np.where(d_flat == 10)[0]
+        wall_x = np.delete(d_x_flat, idx)
+        wall_y = np.delete(d_y_flat, idx)
+        wall_z = np.delete(d_z_flat, idx)
 
 
 
-
-
-                    d = mp.img_depth[i][j]
-                    isNaN = np.isnan(d)
-                    if isNaN:
-                        # print('isNaN')
-                        d = 10
-                    dist_x, dist_y, dist_z = mp.get_dist(d, j, i) # w, h
-
-                    dist_x_rot, dist_y_rot = rot.dot(np.array([dist_x, dist_y]).T) # 원래 매핑 상태와 맞게 매칭한 그래프
-
-                    if d != 10:
-                        wall_x = np.append(wall_x, dist_x_rot)
-                        wall_y = np.append(wall_y, dist_y_rot)
-                        wall_z = np.append(wall_z, dist_z)
-
-                    # Open space mapping
-                    n = 5 # Resolution (How many)
-                    for k in range(1,n + 1):
-                        open_x = np.append(open_x, dist_x_rot * k / n)
-                        open_y = np.append(open_y, dist_y_rot * k / n)
-                        open_z = np.append(open_z, dist_z * k / n)
-                        # 1m 간격으로 Plot 하는 방법 생각해보기
 
 
         # Check position change
