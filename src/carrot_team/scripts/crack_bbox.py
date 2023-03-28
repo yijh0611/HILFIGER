@@ -50,7 +50,7 @@ class CrackDetector :
             poi = self.poi_queue.get()
             img_display = img.copy()
             results = self.model.predict(source = img, device = 'cpu', save = False, show = False, verbose = False)
-            xyxy = []
+            xyxy_crack = []
             
             for result in results: 
                 conf_list = result.boxes.conf
@@ -60,16 +60,16 @@ class CrackDetector :
             xyxy_list = xyxy_list.cpu().detach().numpy()
             
             if len(conf) == 0: 
-                xyxy = np.concatenate((xyxy, [0]), axis = 0)
+                xyxy_crack = np.concatenate((xyxy_crack, [0]), axis = 0)
                 
             else:
                 idx = np.where(conf > self.c_cut)
                 
                 for xyxy in xyxy_list[idx]:
-                    xyxy = np.concatenate((xyxy, [int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])]), aixs = 0)
-                    cv2.rectangle(img_display, (xyxy[0], xyxy[1]), (xyxy[0], xyxy[1]), (0, 255, 0), 3)
+                    cv2.rectangle(img_display, (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])), (0, 255, 0), 3)
+                    xyxy_crack = np.concatenate((xyxy_crack, [int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])]), axis = 0)
             
-            self.crack_bbox.data = xyxy
+            self.crack_bbox.data = xyxy_crack
             self.pub.publish(self.crack_bbox)
 
     def rospy_spin(self):
