@@ -97,16 +97,16 @@ class DepthUDLR:
                 else:
                     w, d, h = self.get_dist(tmp[i][j], j, i)
                     if d <= d_lim:
-                        if 0.5 <= h <= lim:
+                        if 0 <= h <= lim:
                             bool_array[0] = 0
 
-                        if -1 * lim <= h <= -0.5:
+                        if -1 * lim <= h <= -0:
                             bool_array[1] = 0
 
-                        if -1 * lim <= w <= -0.5:
+                        if -1 * lim <= w <= -0:
                             bool_array[2] = 0
                         
-                        if 0.5 <= w <= lim:
+                        if 0 <= w <= lim:
                             bool_array[3] = 0
                         
                         if d <= d_lim_2:
