@@ -41,6 +41,7 @@ class Mapping:
         
         self.map_np = np.zeros((self.x_size, self.y_size, self.z_size)) # x : Initial drone's orientation, y : left
         self.map_img = np.zeros((self.x_size, self.y_size, self.z_size, 3))
+        self.map_img_tmp = np.zeros((self.x_size, self.y_size, self.z_size, 3))
         # 0 : Unknown, 1 : Open, 2 : Wall
         # Color :
         # Black : Unknown, White : Open, Red : Wall
@@ -354,11 +355,18 @@ if __name__ == "__main__" :
                         mz = map_z[i]
                         
                         try:
-                            mp.wall_np[mx, my, mz] += 30
+                            # !! 기능 추가 n회 이상 장애물이라고 판단한 경우 장애물이라고 기록하기
+                            mp.map_np[mx, my, mz] = 2 # wall
+                            mp.map_img[mx, my, mz, 0] = 0
+                            mp.map_img[mx, my, mz, 1] = 0
+                            mp.map_img[mx, my, mz, 2] = 250
 
-                            if mp.wall_np[mx, my, mz] >= mp.open_np[mx, my, mz]:
-                                mp.map_np[mx, my, mz] = 2 # Wall
-                                mp.map_img[mx, my, mz, 2] = 125 # 빨간색
+                            # 이전 코드
+                            # mp.wall_np[mx, my, mz] += 30
+
+                            # if mp.wall_np[mx, my, mz] >= mp.open_np[mx, my, mz]:
+                            #     mp.map_np[mx, my, mz] = 2 # Wall
+                            #     mp.map_img[mx, my, mz, 2] = 125 # 빨간색
                         except:
                             count += 1
                     
@@ -382,10 +390,17 @@ if __name__ == "__main__" :
                         mz = map_z[i]
 
                         try:
-                            mp.open_np[mx, my, mz] += 1
-                            if mp.open_np[mx, my, mz] > mp.wall_np[mx, my, mz]:
-                                mp.map_np[mx, my, mz] = 1 # Open space
-                                mp.map_img[mx, my, mz, :] = 125
+                            # 기능 추가해서 Open이라고 n회 이상 판단한 경우 열린 공간이라고 판단하기.
+                            if mp.map_np[mx, my, mz] == 0: # Not seen
+                                mp.map_np[mx, my, mz] = 1
+                                mp.map_img[mx, my, mz, :] = 50
+
+
+                            # 기존 코드
+                            # mp.open_np[mx, my, mz] += 1
+                            # if mp.open_np[mx, my, mz] > mp.wall_np[mx, my, mz]:
+                            #     mp.map_np[mx, my, mz] = 1 # Open space
+                            #     mp.map_img[mx, my, mz, :] = 125
                         except:
                             count += 1
                     
@@ -394,29 +409,59 @@ if __name__ == "__main__" :
 
                 print(time.time() - mp.time_total)
 
+                # imshow mapping
+                # # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분 - 이거 확인해본 결과 업데이트 안해도 될 듯 하다.
+                if len(wall_x) > 0:
+                    print('len wall : ',len(wall_x))
+                    fig = plt.figure()
+                    ax = fig.add_subplot(1, 2, 1, projection = '3d')
+                    ax.scatter(wall_x, wall_y, wall_z, marker = '.')
+                    # plt.grid(True)
+                    # ax.title('3D')
 
-                    # for i in range(len(open_x)):
-                    #     map_x = int(mp.drone_pose[0] + open_y[i]) # !! 여기서도 문제가 있을 수도 있으니 결과 보고 수정 필요하면 수정하기.
-                    #     map_y = int(mp.drone_pose[1] - open_x[i])
-                    #     map_z = int(mp.drone_pose[2] + open_z[i])
+                    # plt.subplot(2,1,2)
+                    # new map temp
+                    # h_tmp = int(mp.drone_pose[2])
+                    wall_x_tmp = np.array([])
+                    wall_y_tmp = np.array([])
+                    # print('wall_z :', len(wall_z))
+                    for i,n in enumerate(wall_z):
+                        if int(n) == 0:
+                            wall_x_tmp = np.append(wall_x_tmp, wall_x[i])
+                            wall_y_tmp = np.append(wall_y_tmp, wall_y[i])
+                        
+                    ax = fig.add_subplot(1, 2, 2)
+                    ax.scatter(open_x, open_y)
+                    ax.scatter(wall_x_tmp, wall_y_tmp)
+                    # ax.scatter(wall_x, wall_y)
+                    ax.grid(True)
+                    ax.scatter(0, 0)
+                    # ax.title('2D')
+                    
+                    # # plt.show()
 
-                    #     try:
-                    #         mp.open_np[map_x, map_y, map_z] += 1
-                    #         # if mp.map_np[map_x, map_y, map_z] == 0:
-                    #         if mp.open_np[map_x, map_y, map_z] > mp.wall_np[map_x, map_y, map_z] * 10:
-                    #             mp.map_np[map_x, map_y, map_z] = 1 # Open space
-                    #             mp.map_img[map_x, map_y, map_z, :] = 125
-                    #             # mp.map_img[mp.x_size - map_x, mp.y_size - map_y, map_z, :] = 125
-                    #             # print(map_x, map_y, map_z)
-                    #     except:
-                    #         pass
+                    # 이미지 저장 후 다시 불러와서 imshow
+                    filename = 'plot.png'
+                    fig.savefig(filename)
+
+                    img = cv2.imread(filename)
+
+                    cv2.imshow("Local mapping", img)
+                    key = cv2.waitKey(10)
+
 
         mul = 20
-        mp.map_img_tmp = mp.map_img * 1
-        mp.map_img_tmp = np.flip(mp.map_img, (0,1))
+        mp.map_img_tmp = np.array(mp.map_img)
+        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 0] = 0
+        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 2] = 0
+        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 1] = 125
+        # print('color : ', mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), int(mp.drone_pose[2]), :])
+        mp.map_img_tmp = np.flip(mp.map_img_tmp, (0,1))
         # print(np.shape(mp.map_img_tmp))
 
-        img = cv2.resize(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul))
+        # print('shape :', np.shape(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :]))
+
+        img = cv2.resize(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul), interpolation = cv2.INTER_NEAREST)
         cv2.imwrite('/root/pic/global_map.png', img)
         cv2.imshow('Global map', img)
         key = cv2.waitKey(10)
@@ -424,44 +469,4 @@ if __name__ == "__main__" :
         if key == ord('q'):
             break
 
-        # # # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분
-        # if len(wall_x) > 0:
-        #     print(len(wall_x))
-        #     fig = plt.figure()
-        #     ax = fig.add_subplot(1, 2, 1, projection = '3d')
-        #     ax.scatter(wall_x, wall_y, wall_z, marker = '.')
-        #     # plt.grid(True)
-        #     # ax.title('3D')
-
-        #     # plt.subplot(2,1,2)
-        #     # new map temp
-        #     # h_tmp = int(mp.drone_pose[2])
-        #     wall_x_tmp = np.array([])
-        #     wall_y_tmp = np.array([])
-        #     # print('wall_z :', len(wall_z))
-        #     for i,n in enumerate(wall_z):
-        #         if int(n) == 0:
-        #             wall_x_tmp = np.append(wall_x_tmp, wall_x[i])
-        #             wall_y_tmp = np.append(wall_y_tmp, wall_y[i])
-                
-        #     ax = fig.add_subplot(1, 2, 2)
-        #     ax.scatter(open_x, open_y)
-        #     ax.scatter(wall_x_tmp, wall_y_tmp)
-        #     # ax.scatter(wall_x, wall_y)
-        #     ax.grid(True)
-        #     ax.scatter(0, 0)
-        #     # ax.title('2D')
-            
-        #     # # plt.show()
-
-        #     # 이미지 저장 후 다시 불러와서 imshow
-        #     filename = 'plot.png'
-        #     fig.savefig(filename)
-
-        #     img = cv2.imread(filename)
-
-        #     # cv2.imshow("Local mapping", img)
-        #     # key = cv2.waitKey(10)
-
-        # # print(time.time() - mp.time_total)
     cv2.destroyAllWindows()
