@@ -9,11 +9,7 @@ def main(args):
     
     WEIGHTS = '/home/metrics/FBM2/carrot_ws/crack_model/x.pt'
     
-    if torch.cuda.is_available():
-        DEVICE = "0"
-        
-    else:
-        DEVICE = "cpu"
+    DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     if os.path.isfile(WEIGHTS):
 
@@ -34,7 +30,7 @@ def main(args):
             with open(SAVE_DIR, 'w') as f :
 
                 for img in img_list :
-                    results = model.predict(source = EVALUATION_DIR + img, device = DEVICE, save = False, show = False, verbose = False)
+                    results = model.predict(source = EVALUATION_DIR + img, save = False, show = False, verbose = False)
 
                     for result in results:
                         conf_list = result.boxes.conf
