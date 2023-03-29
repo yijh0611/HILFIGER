@@ -466,6 +466,20 @@ if __name__ == "__main__" :
         cv2.imshow('Global map', img)
         key = cv2.waitKey(10)
 
+        # imshow up down
+        mp.ud = np.array(mp.map_img[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, :])
+        mp.ud[int(mp.drone_pose[2]), :] = 0
+        mp.ud[int(mp.drone_pose[2]), 1] = 125
+        mp.ud = np.reshape(mp.ud, (26,1,3))
+        mp.ud = np.flip(mp.ud, (0))
+        img = cv2.resize(mp.ud, dsize = (1 * mul, 26 * mul), interpolation = cv2.INTER_NEAREST)
+        
+        cv2.imshow('Up and down', img)
+        key = cv2.waitKey(10)
+
+        # print(np.shape(mp.ud))
+
+
         if key == ord('q'):
             break
 
