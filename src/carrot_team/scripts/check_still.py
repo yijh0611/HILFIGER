@@ -54,6 +54,9 @@ class CheckStill:
 
     def ros_spin(self):
         rospy.spin()
+    
+    def rmse(self, y1, y2):
+        return np.sqrt(((y1-y2)**2).mean())
 
     def get_imu(self, msg):
         # get imu data
@@ -89,7 +92,7 @@ class CheckStill:
             self.ang_vel_z = np.delete(self.ang_vel_z, 0)
 
             std_np = np.array([])
-            # RMSE 구하기 - 일단 구하고 제일 작은 값 출력
+            # 표준편차 구하기 - 일단 구하고 제일 작은 값 출력
             std_np = np.append(std_np, np.std(self.ori_x))
             std_np = np.append(std_np, np.std(self.ori_y))
             std_np = np.append(std_np, np.std(self.ori_z))
@@ -103,11 +106,31 @@ class CheckStill:
             std_np = np.append(std_np, np.std(self.ang_vel_y))
             std_np = np.append(std_np, np.std(self.ang_vel_z))
 
+            # RMSE of latest value
+            rmse_np = np.array([self.rmse(self.ori_x, msg.orientation.x)])
+            rmse_np = np.append(rmse_np, self.rmse(self.ori_y, msg.orientation.y))
+            rmse_np = np.append(rmse_np, self.rmse(self.ori_z, msg.orientation.z))
+            rmse_np = np.append(rmse_np, self.rmse(self.ori_w, msg.orientation.w))
+
+            rmse_np = np.append(rmse_np, self.rmse(self.lin_x, msg.linear_acceleration.x))
+            rmse_np = np.append(rmse_np, self.rmse(self.lin_y, msg.linear_acceleration.y))
+            rmse_np = np.append(rmse_np, self.rmse(self.lin_z, msg.linear_acceleration.z))
+
+            rmse_np = np.append(rmse_np, self.rmse(self.ang_vel_x, msg.angular_velocity.x))
+            rmse_np = np.append(rmse_np, self.rmse(self.ang_vel_y, msg.angular_velocity.y))
+            rmse_np = np.append(rmse_np, self.rmse(self.ang_vel_z, msg.angular_velocity.z))
+
+            # print(np.max(rmse_np))
+
             # print(np.max(std_np))
-            if np.max(std_np) > 0.07:
+            if np.max(std_np) > 0.04: # Moving # 0.05 // 작을 수록 보수적
                 self.is_still = False
             else:
                 self.is_still = True
+
+            if np.max(rmse_np) > 0.01: # Moving # 0.015 // 작을 수록 보수적
+                self.is_still = False
+            
             
             msg = Bool()
             msg.data = self.is_still
