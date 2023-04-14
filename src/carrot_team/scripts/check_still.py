@@ -123,12 +123,12 @@ class CheckStill:
             # print(np.max(rmse_np))
 
             # print(np.max(std_np))
-            if np.max(std_np) > 0.05: # Moving
+            if np.max(std_np) > 0.04: # Moving # 0.05 // 작을 수록 보수적
                 self.is_still = False
             else:
                 self.is_still = True
 
-            if np.max(rmse_np) > 0.03: # Moving
+            if np.max(rmse_np) > 0.01: # Moving # 0.015 // 작을 수록 보수적
                 self.is_still = False
             
             
