@@ -18,6 +18,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from sensor_msgs.msg import Image # Subscribe image
 from std_msgs.msg import Bool # Is get poi ready
 from std_msgs.msg import Float64 # get yaw
+from std_msgs.msg import Header
 from std_msgs.msg import Int32MultiArray, MultiArrayDimension # Publish map in 3D Array
 
 
@@ -28,6 +29,7 @@ class Mapping:
 
         # is drone still
         self.is_still = False
+
 
         # Constant variable
         self.WIDTH = 640
@@ -153,6 +155,10 @@ class Mapping:
         
         rospy.init_node('mapping_node', anonymous=True)
 
+        # map time
+        self.map_time_string = Header()
+        self.map_time_string.stamp = rospy.Time.now()
+
         rospy.Subscriber('/red/camera/depth/image_raw', Image, self.image_callback_depth)
         rospy.Subscriber('/red/carrot/yaw', Float64, self.yaw_rad) # /red/uav/yaw 도 있는데, 값이 크게 차이나지는 않는거 같아서 그냥 이거 썼다.
         rospy.Subscriber('/red/carrot/pose', PoseStamped, self.get_pose)
@@ -161,15 +167,23 @@ class Mapping:
 
         # Publish map
         self.pub_map = rospy.Publisher('/carrot_team/map', Int32MultiArray, queue_size = 10)
+        self.pub_rostime = rospy.Publisher('/carrot_team/map_time', Header, queue_size = 10)
 
         t = threading.Thread(target = self.ros_spin)
         t_pub_map = threading.Thread(target = self.publish_map)
+        t_send_rostime = threading.Thread(target = self.pub_map_time)
         
         t.start()
         t_pub_map.start()
+        t_send_rostime.start()
     
     def ros_spin(self):
         rospy.spin()
+
+    def pub_map_time(self):
+        while not rospy.is_shutdown():
+            self.pub_rostime.publish(self.map_time_string)
+            time.sleep(0.005) # 200 Hz
 
     def image_callback_depth(self, msg):
         # get depth image
@@ -329,6 +343,9 @@ if __name__ == "__main__" :
 
                 img_d_x_new = cy * img_d_x - sy * img_d_y # rotated
                 img_d_y_new = cy * img_d_y + sy * img_d_x # rotated
+
+                # update time
+                mp.map_time_string.stamp = rospy.Time.now()
 
                 # flatten
                 d_flat = np.reshape(img_d_y, (-1))
