@@ -36,7 +36,7 @@ class CrackDetector :
 
         try:
             self.img_queue.put(self.data['img'])
-            self.depth_queue.put(self.data_depth['img'])
+            self.depth_img_queue.put(self.data_depth['img'])
 
         except KeyError:
             pass
