@@ -6,6 +6,7 @@ from queue import Queue
 import threading
 from cv_bridge import CvBridge
 import numpy as np
+import torch
 from ultralytics import YOLO
 
 from sensor_msgs.msg import Image

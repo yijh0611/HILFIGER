@@ -1,0 +1,15 @@
+Update and upgrade
+--> sudo apt update
+--> sudo apt upgrade
+
+pip3
+Installation:
+--> sudo apt install python3-pip -y
+
+pytorch(CUDA 11.8)
+Installation:
+--> pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+ultralytics
+Installation:
+--> pip3 install ultralytics
