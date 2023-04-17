@@ -36,7 +36,7 @@ class CrackDetector :
 
         try:
             self.img_queue.put(self.data['img'])
-            self.depth_queue.put(self.data_depth['img'])
+            self.depth_img_queue.put(self.data_depth['img'])
 
         except KeyError:
             pass
@@ -60,7 +60,7 @@ class CrackDetector :
             poi = self.poi_queue.get()
             img_display = img.copy()
             # Check Depth map
-            img_d = self.depth_queue.get()
+            img_d = self.depth_img_queue.get()
             is_yolo = False
             img_d[np.isnan(img_d)] = 10.0
             if np.min(img_d) < 2.3:
