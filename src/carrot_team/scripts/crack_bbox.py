@@ -7,6 +7,7 @@ import threading
 from cv_bridge import CvBridge
 import numpy as np
 import torch
+import torch
 from ultralytics import YOLO
 
 from sensor_msgs.msg import Image
@@ -17,16 +18,17 @@ class CrackDetector :
     
     def __init__(self): 
         
-        self.weights = '../detector/l.pt'
-        self.DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.weights = '/root/uav_ws/src/icuas23_competition/detector/l.pt'
         self.model = YOLO(self.weights)
         self.c_cut = 0.01
         self.bridge = CvBridge()
-        self.crack_bbox = Int32MultiArray()
         self.poi_queue = Queue()
         self.img_queue = Queue()
         self.data = {}
-        self.pub = rospy.Publisher('/carrot_team/crack_bbox', Int32MultiArray, queue_size = 10)
+        self.data_depth = {}
+        self.depth_img_queue = Queue()
+        # For publishing msg
+        self.img_pub = rospy.Publisher('/red/crack_image_annotated', Image, queue_size = 100)
 
     def poi_callback(self, msg):
 
@@ -34,13 +36,19 @@ class CrackDetector :
 
         try:
             self.img_queue.put(self.data['img'])
+            self.depth_queue.put(self.data_depth['img'])
 
         except KeyError:
             pass
 
+
     def img_callback(self, msg):
 
         self.data['img'] = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+    
+    def depth_img_callback(self, msg):
+
+        self.data_depth['img'] = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
 
     def detect_callback(self):
 
@@ -51,28 +59,43 @@ class CrackDetector :
             img = self.img_queue.get()
             poi = self.poi_queue.get()
             img_display = img.copy()
-            results = self.model.predict(source = img, save = False, show = False, verbose = False)
-            xyxy_crack = []
-            
-            for result in results: 
-                conf_list = result.boxes.conf
-                xyxy_list = result.boxes.xyxy
-                
-            conf = conf_list.cpu().detach().numpy()
-            xyxy_list = xyxy_list.cpu().detach().numpy()
-            
-            if len(conf) == 0: 
-                xyxy_crack = np.concatenate((xyxy_crack, [0]), axis = 0)
-                
+            # Check Depth map
+            img_d = self.depth_queue.get()
+            is_yolo = False
+            img_d[np.isnan(img_d)] = 10.0
+            if np.min(img_d) < 2.3:
+                is_yolo = True
+                print("is_yolo : True")
             else:
-                idx = np.where(conf > self.c_cut)
-                
-                for xyxy in xyxy_list[idx]:
-                    cv2.rectangle(img_display, (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])), (0, 255, 0), 3)
-                    xyxy_crack = np.concatenate((xyxy_crack, [int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])]), axis = 0)
+                print("is_yolo : False")
             
-            self.crack_bbox.data = xyxy_crack
-            self.pub.publish(self.crack_bbox)
+            # Yolo
+            if is_yolo:
+                results = self.model.predict(source = img, device = 'cpu', save = False, show = False, verbose = False)
+                xyxy_crack = []
+                
+                for result in results: 
+                    conf_list = result.boxes.conf
+                    xyxy_list = result.boxes.xyxy
+                    
+                conf = conf_list.cpu().detach().numpy()
+                xyxy_list = xyxy_list.cpu().detach().numpy()
+                
+                if len(conf) == 0: 
+                    xyxy_crack = np.concatenate((xyxy_crack, [0]), axis = 0)
+                    
+                else:
+                    idx = np.where(conf > self.c_cut)
+                    
+                    for xyxy in xyxy_list[idx]:
+                        cv2.rectangle(img_display, (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])), (0, 255, 0), 3)
+                
+                    # Convert annotated image to ROS message and publish
+                    img_annotated_msg = self.bridge.cv2_to_imgmsg(img_display, encoding='bgr8')
+                    self.img_pub.publish(img_annotated_msg)
+                
+                cv2.imshow('crack_bbox', img_display)
+                cv2.waitKey(10)
 
     def rospy_spin(self):
         rospy.spin()
@@ -82,6 +105,7 @@ if __name__ == '__main__':
     detector = CrackDetector()
     rospy.Subscriber('/carrot_team/poi_idx', Int16, detector.poi_callback)
     rospy.Subscriber('/red/camera/color/image_raw', Image, detector.img_callback)
+    rospy.Subscriber('/red/camera/depth/image_raw', Image, detector.depth_img_callback) # Get depth map
     t = threading.Thread(target = detector.rospy_spin)
     t.start()
     
