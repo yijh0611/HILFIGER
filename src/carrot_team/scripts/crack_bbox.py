@@ -6,6 +6,7 @@ from queue import Queue
 import threading
 from cv_bridge import CvBridge
 import numpy as np
+import torch
 from ultralytics import YOLO
 
 from sensor_msgs.msg import Image
@@ -17,6 +18,7 @@ class CrackDetector :
     def __init__(self): 
         
         self.weights = '../detector/l.pt'
+        self.DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = YOLO(self.weights)
         self.c_cut = 0.01
         self.bridge = CvBridge()
@@ -49,7 +51,7 @@ class CrackDetector :
             img = self.img_queue.get()
             poi = self.poi_queue.get()
             img_display = img.copy()
-            results = self.model.predict(source = img, device = 'cpu', save = False, show = False, verbose = False)
+            results = self.model.predict(source = img, save = False, show = False, verbose = False)
             xyxy_crack = []
             
             for result in results: 
