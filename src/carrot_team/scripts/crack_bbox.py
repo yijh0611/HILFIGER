@@ -16,15 +16,15 @@ class CrackDetector :
     
     def __init__(self): 
         
-        self.weights = '../detector/l.pt'
+        self.weights = '/root/uav_ws/src/icuas23_competition/detector/l.pt'
         self.model = YOLO(self.weights)
         self.c_cut = 0.01
         self.bridge = CvBridge()
-        self.crack_bbox = Int32MultiArray()
         self.poi_queue = Queue()
         self.img_queue = Queue()
         self.data = {}
-        self.pub = rospy.Publisher('/carrot_team/crack_bbox', Int32MultiArray, queue_size = 10)
+        # For publishing msg
+        self.img_pub = rospy.Publisher('/red/crack_image_annotated', Image, queue_size = 100)
 
     def poi_callback(self, msg):
 
@@ -35,6 +35,7 @@ class CrackDetector :
 
         except KeyError:
             pass
+
 
     def img_callback(self, msg):
 
@@ -67,10 +68,13 @@ class CrackDetector :
                 
                 for xyxy in xyxy_list[idx]:
                     cv2.rectangle(img_display, (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])), (0, 255, 0), 3)
-                    xyxy_crack = np.concatenate((xyxy_crack, [int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3])]), axis = 0)
             
-            self.crack_bbox.data = xyxy_crack
-            self.pub.publish(self.crack_bbox)
+                # Convert annotated image to ROS message and publish
+                img_annotated_msg = self.bridge.cv2_to_imgmsg(img_display, encoding='bgr8')
+                self.img_pub.publish(img_annotated_msg)
+            
+            cv2.imshow('crack_bbox', img_display)
+            cv2.waitKey(10)
 
     def rospy_spin(self):
         rospy.spin()
