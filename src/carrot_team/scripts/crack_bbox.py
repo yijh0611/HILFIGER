@@ -7,7 +7,6 @@ import threading
 from cv_bridge import CvBridge
 import numpy as np
 import torch
-import torch
 from ultralytics import YOLO
 
 from sensor_msgs.msg import Image
@@ -16,7 +15,7 @@ import cv2
 
 class CrackDetector : 
     
-    def __init__(self): 
+    def __init__(self):
         
         self.weights = '/root/uav_ws/src/icuas23_competition/detector/l.pt'
         self.model = YOLO(self.weights)
@@ -27,6 +26,19 @@ class CrackDetector :
         self.data = {}
         self.data_depth = {}
         self.depth_img_queue = Queue()
+
+        
+        # Start ros
+        rospy.init_node('crack_ros', anonymous=True)
+
+        rospy.Subscriber('/carrot_team/poi_idx', Int16, self.poi_callback)
+        rospy.Subscriber('/red/camera/color/image_raw', Image, self.img_callback)
+        rospy.Subscriber('/red/camera/depth/image_raw', Image, self.depth_img_callback) # Get depth map
+        
+        # Start ros_spin
+        t = threading.Thread(target = self.rospy_spin)
+        t.start()
+
         # For publishing msg
         self.img_pub = rospy.Publisher('/red/crack_image_annotated', Image, queue_size = 100)
 
@@ -43,11 +55,11 @@ class CrackDetector :
 
 
     def img_callback(self, msg):
-
+        print("Subscribe Image")
         self.data['img'] = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
     
     def depth_img_callback(self, msg):
-
+        print("Subscribe Depth")
         self.data_depth['img'] = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
 
     def detect_callback(self):
@@ -101,13 +113,8 @@ class CrackDetector :
         rospy.spin()
 
 if __name__ == '__main__':
-    rospy.init_node('crack_ros', anonymous=True)
+    # Start class
     detector = CrackDetector()
-    rospy.Subscriber('/carrot_team/poi_idx', Int16, detector.poi_callback)
-    rospy.Subscriber('/red/camera/color/image_raw', Image, detector.img_callback)
-    rospy.Subscriber('/red/camera/depth/image_raw', Image, detector.depth_img_callback) # Get depth map
-    t = threading.Thread(target = detector.rospy_spin)
-    t.start()
     
     while not rospy.is_shutdown():
         detector.detect_callback()
