@@ -362,6 +362,13 @@ if __name__ == "__main__" :
                 d_x_flat = d_x_flat[idx]
                 d_z_flat = d_z_flat[idx]
 
+                # remove propller_2 using distance
+                idx = np.where(d_flat >= 0.3)
+                d_flat = d_flat[idx]
+                d_y_flat = d_y_flat[idx]
+                d_x_flat = d_x_flat[idx]
+                d_z_flat = d_z_flat[idx]
+
                 # Open space
                 for i in range(1, mp.res):
                     open_x = np.append(open_x, d_x_flat * i / mp.res)
