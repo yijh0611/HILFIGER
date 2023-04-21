@@ -24,6 +24,9 @@ from std_msgs.msg import Int32MultiArray, MultiArrayDimension # Publish map in 3
 
 class Mapping:
     def __init__(self):
+        # is imshow
+        self.is_imshow = False
+
         # is get POI end
         self.is_poi = False
 
@@ -454,78 +457,80 @@ if __name__ == "__main__" :
 
                 print(time.time() - mp.time_total)
 
-                # imshow mapping
-                # # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분 - 이거 확인해본 결과 업데이트 안해도 될 듯 하다.
-                if len(wall_x) > 0:
-                    print('len wall : ',len(wall_x))
-                    fig = plt.figure()
-                    ax = fig.add_subplot(1, 2, 1, projection = '3d')
-                    ax.scatter(wall_x, wall_y, wall_z, marker = '.')
-                    # plt.grid(True)
-                    # ax.title('3D')
+                if mp.is_imshow:
+                    # imshow mapping
+                    # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분 - 이거 확인해본 결과 업데이트 안해도 될 듯 하다.
+                    if len(wall_x) > 0:
+                        print('len wall : ',len(wall_x))
+                        fig = plt.figure()
+                        ax = fig.add_subplot(1, 2, 1, projection = '3d')
+                        ax.scatter(wall_x, wall_y, wall_z, marker = '.')
+                        # plt.grid(True)
+                        # ax.title('3D')
 
-                    # plt.subplot(2,1,2)
-                    # new map temp
-                    # h_tmp = int(mp.drone_pose[2])
-                    wall_x_tmp = np.array([])
-                    wall_y_tmp = np.array([])
-                    # print('wall_z :', len(wall_z))
-                    for i,n in enumerate(wall_z):
-                        if int(n) == 0:
-                            wall_x_tmp = np.append(wall_x_tmp, wall_x[i])
-                            wall_y_tmp = np.append(wall_y_tmp, wall_y[i])
+                        # plt.subplot(2,1,2)
+                        # new map temp
+                        # h_tmp = int(mp.drone_pose[2])
+                        wall_x_tmp = np.array([])
+                        wall_y_tmp = np.array([])
+                        # print('wall_z :', len(wall_z))
+                        for i,n in enumerate(wall_z):
+                            if int(n) == 0:
+                                wall_x_tmp = np.append(wall_x_tmp, wall_x[i])
+                                wall_y_tmp = np.append(wall_y_tmp, wall_y[i])
+                            
+                        ax = fig.add_subplot(1, 2, 2)
+                        ax.scatter(open_x, open_y)
+                        ax.scatter(wall_x_tmp, wall_y_tmp)
+                        # ax.scatter(wall_x, wall_y)
+                        ax.grid(True)
+                        ax.scatter(0, 0)
+                        # ax.title('2D')
                         
-                    ax = fig.add_subplot(1, 2, 2)
-                    ax.scatter(open_x, open_y)
-                    ax.scatter(wall_x_tmp, wall_y_tmp)
-                    # ax.scatter(wall_x, wall_y)
-                    ax.grid(True)
-                    ax.scatter(0, 0)
-                    # ax.title('2D')
-                    
-                    # # plt.show()
+                        # # plt.show()
 
-                    # 이미지 저장 후 다시 불러와서 imshow
-                    filename = 'plot.png'
-                    fig.savefig(filename)
+                        # 이미지 저장 후 다시 불러와서 imshow
+                        filename = 'plot.png'
+                        fig.savefig(filename)
 
-                    img = cv2.imread(filename)
+                        img = cv2.imread(filename)
 
-                    cv2.imshow("Local mapping", img)
-                    key = cv2.waitKey(10)
+                        cv2.imshow("Local mapping", img)
+                        key = cv2.waitKey(10)
 
+        if mp.is_imshow:
+            mul = 20
+            mp.map_img_tmp = np.array(mp.map_img)
+            mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 0] = 0
+            mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 2] = 0
+            mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 1] = 125
+            # print('color : ', mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), int(mp.drone_pose[2]), :])
+            mp.map_img_tmp = np.flip(mp.map_img_tmp, (0,1))
+            # print(np.shape(mp.map_img_tmp))
 
-        mul = 20
-        mp.map_img_tmp = np.array(mp.map_img)
-        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 0] = 0
-        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 2] = 0
-        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 1] = 125
-        # print('color : ', mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), int(mp.drone_pose[2]), :])
-        mp.map_img_tmp = np.flip(mp.map_img_tmp, (0,1))
-        # print(np.shape(mp.map_img_tmp))
+            # print('shape :', np.shape(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :]))
 
-        # print('shape :', np.shape(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :]))
+            img = cv2.resize(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul), interpolation = cv2.INTER_NEAREST)
+            cv2.imwrite('/root/pic/global_map.png', img)
+            cv2.imshow('Global map', img)
+            key = cv2.waitKey(10)
 
-        img = cv2.resize(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul), interpolation = cv2.INTER_NEAREST)
-        cv2.imwrite('/root/pic/global_map.png', img)
-        cv2.imshow('Global map', img)
-        key = cv2.waitKey(10)
+            # imshow up down
+            mp.ud = np.array(mp.map_img[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, :])
+            mp.ud[int(mp.drone_pose[2]), :] = 0
+            mp.ud[int(mp.drone_pose[2]), 1] = 125
+            mp.ud = np.reshape(mp.ud, (26,1,3))
+            mp.ud = np.flip(mp.ud, (0))
+            img = cv2.resize(mp.ud, dsize = (1 * mul, 26 * mul), interpolation = cv2.INTER_NEAREST)
+            
+            cv2.imshow('Up and down', img)
+            key = cv2.waitKey(10)
 
-        # imshow up down
-        mp.ud = np.array(mp.map_img[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, :])
-        mp.ud[int(mp.drone_pose[2]), :] = 0
-        mp.ud[int(mp.drone_pose[2]), 1] = 125
-        mp.ud = np.reshape(mp.ud, (26,1,3))
-        mp.ud = np.flip(mp.ud, (0))
-        img = cv2.resize(mp.ud, dsize = (1 * mul, 26 * mul), interpolation = cv2.INTER_NEAREST)
-        
-        cv2.imshow('Up and down', img)
-        key = cv2.waitKey(10)
-
-        # print(np.shape(mp.ud))
+            # print(np.shape(mp.ud))
 
 
-        if key == ord('q'):
-            break
+            if key == ord('q'):
+                break
 
-    cv2.destroyAllWindows()
+    if mp.is_imshow:
+        cv2.destroyAllWindows()

@@ -74,6 +74,7 @@ class CrackDetector :
             # Check Depth map
             img_d = self.depth_img_queue.get()
             is_yolo = False
+            img_d = np.array(img_d) * 1
             img_d[np.isnan(img_d)] = 10.0
             if np.min(img_d) < 2.3:
                 is_yolo = True
