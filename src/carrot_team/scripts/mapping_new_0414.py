@@ -457,45 +457,46 @@ if __name__ == "__main__" :
 
                 print(time.time() - mp.time_total)
 
-                # imshow mapping
-                # # # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분 - 이거 확인해본 결과 업데이트 안해도 될 듯 하다.
-                if len(wall_x) > 0:
-                    print('len wall : ',len(wall_x))
-                    fig = plt.figure()
-                    ax = fig.add_subplot(1, 2, 1, projection = '3d')
-                    ax.scatter(wall_x, wall_y, wall_z, marker = '.')
-                    # plt.grid(True)
-                    # ax.title('3D')
+                if mp.is_imshow:
+                    # imshow mapping
+                    # 갈 수 있는 곳과 갈 수 없는 곳 둘다 매핑해서 Plot 하는 부분 - 이거 확인해본 결과 업데이트 안해도 될 듯 하다.
+                    if len(wall_x) > 0:
+                        print('len wall : ',len(wall_x))
+                        fig = plt.figure()
+                        ax = fig.add_subplot(1, 2, 1, projection = '3d')
+                        ax.scatter(wall_x, wall_y, wall_z, marker = '.')
+                        # plt.grid(True)
+                        # ax.title('3D')
 
-                    # plt.subplot(2,1,2)
-                    # new map temp
-                    # h_tmp = int(mp.drone_pose[2])
-                    wall_x_tmp = np.array([])
-                    wall_y_tmp = np.array([])
-                    # print('wall_z :', len(wall_z))
-                    for i,n in enumerate(wall_z):
-                        if int(n) == 0:
-                            wall_x_tmp = np.append(wall_x_tmp, wall_x[i])
-                            wall_y_tmp = np.append(wall_y_tmp, wall_y[i])
+                        # plt.subplot(2,1,2)
+                        # new map temp
+                        # h_tmp = int(mp.drone_pose[2])
+                        wall_x_tmp = np.array([])
+                        wall_y_tmp = np.array([])
+                        # print('wall_z :', len(wall_z))
+                        for i,n in enumerate(wall_z):
+                            if int(n) == 0:
+                                wall_x_tmp = np.append(wall_x_tmp, wall_x[i])
+                                wall_y_tmp = np.append(wall_y_tmp, wall_y[i])
+                            
+                        ax = fig.add_subplot(1, 2, 2)
+                        ax.scatter(open_x, open_y)
+                        ax.scatter(wall_x_tmp, wall_y_tmp)
+                        # ax.scatter(wall_x, wall_y)
+                        ax.grid(True)
+                        ax.scatter(0, 0)
+                        # ax.title('2D')
                         
-                    ax = fig.add_subplot(1, 2, 2)
-                    ax.scatter(open_x, open_y)
-                    ax.scatter(wall_x_tmp, wall_y_tmp)
-                    # ax.scatter(wall_x, wall_y)
-                    ax.grid(True)
-                    ax.scatter(0, 0)
-                    # ax.title('2D')
-                    
-                    # # plt.show()
+                        # # plt.show()
 
-                    # 이미지 저장 후 다시 불러와서 imshow
-                    filename = 'plot.png'
-                    fig.savefig(filename)
+                        # 이미지 저장 후 다시 불러와서 imshow
+                        filename = 'plot.png'
+                        fig.savefig(filename)
 
-                    img = cv2.imread(filename)
+                        img = cv2.imread(filename)
 
-                    cv2.imshow("Local mapping", img)
-                    key = cv2.waitKey(10)
+                        cv2.imshow("Local mapping", img)
+                        key = cv2.waitKey(10)
 
         if mp.is_imshow:
             mul = 20
