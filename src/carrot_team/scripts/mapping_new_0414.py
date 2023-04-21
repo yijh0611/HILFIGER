@@ -103,6 +103,8 @@ class Mapping:
 
         self.res = 10 # open space mapping resolution
 
+        self.DRONE_TO_CAM = 0.2
+
         # Change if necessary
         self.W_RAD = math.radians(87)
         self.H_RAD = math.radians(58)
@@ -337,7 +339,7 @@ if __name__ == "__main__" :
 
                 # change nan to 10
                 img_d_y = np.nan_to_num(mp.img_depth, nan = 10) * mp.mask
-                img_d_y = img_d_y[::mp.H_SKIP,::mp.W_SKIP]
+                img_d_y = img_d_y[::mp.H_SKIP,::mp.W_SKIP] + mp.DRONE_TO_CAM
                 img_d_x = img_d_y * mp.W_TAN
                 img_d_z = img_d_y * mp.H_TAN
 
