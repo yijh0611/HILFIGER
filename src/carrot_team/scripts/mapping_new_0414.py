@@ -24,6 +24,9 @@ from std_msgs.msg import Int32MultiArray, MultiArrayDimension # Publish map in 3
 
 class Mapping:
     def __init__(self):
+        # is imshow
+        self.is_imshow = False
+
         # is get POI end
         self.is_poi = False
 
@@ -494,38 +497,39 @@ if __name__ == "__main__" :
                     cv2.imshow("Local mapping", img)
                     key = cv2.waitKey(10)
 
+        if mp.is_imshow:
+            mul = 20
+            mp.map_img_tmp = np.array(mp.map_img)
+            mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 0] = 0
+            mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 2] = 0
+            mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 1] = 125
+            # print('color : ', mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), int(mp.drone_pose[2]), :])
+            mp.map_img_tmp = np.flip(mp.map_img_tmp, (0,1))
+            # print(np.shape(mp.map_img_tmp))
 
-        mul = 20
-        mp.map_img_tmp = np.array(mp.map_img)
-        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 0] = 0
-        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 2] = 0
-        mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, 1] = 125
-        # print('color : ', mp.map_img_tmp[int(mp.drone_pose[0]), int(mp.drone_pose[1]), int(mp.drone_pose[2]), :])
-        mp.map_img_tmp = np.flip(mp.map_img_tmp, (0,1))
-        # print(np.shape(mp.map_img_tmp))
+            # print('shape :', np.shape(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :]))
 
-        # print('shape :', np.shape(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :]))
+            img = cv2.resize(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul), interpolation = cv2.INTER_NEAREST)
+            cv2.imwrite('/root/pic/global_map.png', img)
+            cv2.imshow('Global map', img)
+            key = cv2.waitKey(10)
 
-        img = cv2.resize(mp.map_img_tmp[:, :, int(mp.drone_pose[2]), :], dsize = (mp.y_size * mul, mp.x_size * mul), interpolation = cv2.INTER_NEAREST)
-        cv2.imwrite('/root/pic/global_map.png', img)
-        cv2.imshow('Global map', img)
-        key = cv2.waitKey(10)
+            # imshow up down
+            mp.ud = np.array(mp.map_img[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, :])
+            mp.ud[int(mp.drone_pose[2]), :] = 0
+            mp.ud[int(mp.drone_pose[2]), 1] = 125
+            mp.ud = np.reshape(mp.ud, (26,1,3))
+            mp.ud = np.flip(mp.ud, (0))
+            img = cv2.resize(mp.ud, dsize = (1 * mul, 26 * mul), interpolation = cv2.INTER_NEAREST)
+            
+            cv2.imshow('Up and down', img)
+            key = cv2.waitKey(10)
 
-        # imshow up down
-        mp.ud = np.array(mp.map_img[int(mp.drone_pose[0]), int(mp.drone_pose[1]), :, :])
-        mp.ud[int(mp.drone_pose[2]), :] = 0
-        mp.ud[int(mp.drone_pose[2]), 1] = 125
-        mp.ud = np.reshape(mp.ud, (26,1,3))
-        mp.ud = np.flip(mp.ud, (0))
-        img = cv2.resize(mp.ud, dsize = (1 * mul, 26 * mul), interpolation = cv2.INTER_NEAREST)
-        
-        cv2.imshow('Up and down', img)
-        key = cv2.waitKey(10)
-
-        # print(np.shape(mp.ud))
+            # print(np.shape(mp.ud))
 
 
-        if key == ord('q'):
-            break
+            if key == ord('q'):
+                break
 
-    cv2.destroyAllWindows()
+    if mp.is_imshow:
+        cv2.destroyAllWindows()
